@@ -24,7 +24,7 @@ void CP_ReadThis(void);
 #endif
 #endif
 
-char far endStrings[9][80]=
+char endStrings[9][80]=
 {
 #ifndef SPEAR
 	{"Dost thou wish to\nleave with such hasty\nabandon?"},
@@ -59,7 +59,7 @@ CP_iteminfo
 	NewItems={NM_X,NM_Y,4,2,24};
 
 #pragma warn -sus
-CP_itemtype far
+CP_itemtype
 MainMenu[]=
 {
 #ifdef JAPAN
@@ -75,12 +75,12 @@ MainMenu[]=
 	{1,"",0}
 #else
 
-	{1,STR_NG,CP_NewGame},
-	{1,STR_SD,CP_Sound},
-	{1,STR_CL,CP_Control},
-	{1,STR_LG,CP_LoadGame},
-	{0,STR_SG,CP_SaveGame},
-	{1,STR_CV,CP_ChangeView},
+	{1,STR_NG,(void (*)(int w))CP_NewGame},
+	{1,STR_SD,(void (*)(int w))CP_Sound},
+	{1,STR_CL,(void (*)(int w))CP_Control},
+	{1,STR_LG,(void (*)(int w))CP_LoadGame},
+	{0,STR_SG,(void (*)(int w))CP_SaveGame},
+	{1,STR_CV,(void (*)(int w))CP_ChangeView},
 
 #ifndef GOODTIMES
 #ifndef SPEAR
@@ -94,13 +94,13 @@ MainMenu[]=
 #endif
 #endif
 
-	{1,STR_VS,CP_ViewScores},
+	{1,STR_VS,(void (*)(int w))CP_ViewScores},
 	{1,STR_BD,0},
 	{1,STR_QT,0}
 #endif
 },
 
-far SndMenu[]=
+SndMenu[]=
 {
 #ifdef JAPAN
 	{1,"",0},
@@ -131,7 +131,7 @@ far SndMenu[]=
 #endif
 },
 
-far CtlMenu[]=
+CtlMenu[]=
 {
 #ifdef JAPAN
 	{0,"",0},
@@ -145,15 +145,15 @@ far CtlMenu[]=
 	{0,STR_JOYEN,0},
 	{0,STR_PORT2,0},
 	{0,STR_GAMEPAD,0},
-	{0,STR_SENS,MouseSensitivity},
-	{1,STR_CUSTOM,CustomControls}
+	{0,STR_SENS,(void (*)(int w))MouseSensitivity},
+	{1,STR_CUSTOM,(void (*)(int w))CustomControls}
 #endif
 },
 
 #pragma warn +sus
 
 #ifndef SPEAR
-far NewEmenu[]=
+NewEmenu[]=
 {
 #ifdef JAPAN
 #ifdef JAPDEMO
@@ -226,7 +226,7 @@ far NewEmenu[]=
 #endif
 
 
-far NewMenu[]=
+NewMenu[]=
 {
 #ifdef JAPAN
 	{1,"",0},
@@ -241,7 +241,7 @@ far NewMenu[]=
 #endif
 },
 
-far LSMenu[]=
+LSMenu[]=
 {
 	{1,"",0},
 	{1,"",0},
@@ -255,7 +255,7 @@ far LSMenu[]=
 	{1,"",0}
 },
 
-far CusMenu[]=
+CusMenu[]=
 {
 	{1,"",0},
 	{0,"",0},
@@ -296,7 +296,7 @@ char SaveGameNames[10][32],SaveName[13]="SAVEGAM?.";
 // INPUT MANAGER SCANCODE TABLES
 //
 ////////////////////////////////////////////////////////////////////
-static byte
+static char
 					*ScanNames[] =		// Scan code names with single chars
 					{
 	"?","?","1","2","3","4","5","6","7","8","9","0","-","+","?","?",
@@ -308,7 +308,7 @@ static byte
 	"?","?","?","?","?","?","?","?","?","?","?","?","?","?","?","?",
 	"?","?","?","?","?","?","?","?","?","?","?","?","?","?","?","?"
 					},	// DEBUG - consolidate these
-					far ExtScanCodes[] =	// Scan codes with >1 char names
+					ExtScanCodes[] =	// Scan codes with >1 char names
 					{
 	1,0xe,0xf,0x1d,0x2a,0x39,0x3a,0x3b,0x3c,0x3d,0x3e,
 	0x3f,0x40,0x41,0x42,0x43,0x44,0x57,0x59,0x46,0x1c,0x36,
@@ -518,7 +518,7 @@ void US_ControlPanel(byte scancode)
 		#pragma warn -sus
 		MainMenu[viewscores].routine = NULL;
 		#ifndef JAPAN
-		_fstrcpy(MainMenu[viewscores].string,STR_EG);
+		strcpy(MainMenu[viewscores].string,STR_EG);
 		#endif
 		#pragma warn +sus
 	}
@@ -562,9 +562,9 @@ void DrawMainMenu(void)
 		#ifndef JAPAN
 
 		#ifdef SPANISH
-		_fstrcpy(&MainMenu[backtodemo].string,STR_GAME);
+		strcpy(&MainMenu[backtodemo].string,STR_GAME);
 		#else
-		_fstrcpy(&MainMenu[backtodemo].string[8],STR_GAME);
+		strcpy(&MainMenu[backtodemo].string[8],STR_GAME);
 		#endif
 
 		#else
@@ -581,9 +581,9 @@ void DrawMainMenu(void)
 	{
 		#ifndef JAPAN
 		#ifdef SPANISH
-		_fstrcpy(&MainMenu[backtodemo].string,STR_BD);
+		strcpy(&MainMenu[backtodemo].string,STR_BD);
 		#else
-		_fstrcpy(&MainMenu[backtodemo].string[8],STR_DEMO);
+		strcpy(&MainMenu[backtodemo].string[8],STR_DEMO);
 		#endif
 		#else
 		CA_CacheGrChunk(C_MRETDEMOPIC);
@@ -627,8 +627,9 @@ void CP_ReadThis(void)
 void BossKey(void)
 {
 	SD_MusicOff();
-	_AX = 3;
-	geninterrupt(0x10);
+	// PORT
+	/*_AX = 3;
+	geninterrupt(0x10);*/
 	printf("C>");
 	while (!Keyboard[sc_Escape])
 	IN_ClearKeysDown();
@@ -721,7 +722,7 @@ int CP_CheckQuick(unsigned scancode)
 				lasttimecount = TimeCount;
 
 				if (MousePresent)
-					Mouse(MDelta);	// Clear accumulated mouse movement
+					//Mouse(MDelta);	// Clear accumulated mouse movement PORT
 
 				PM_CheckMainMem ();
 
@@ -795,7 +796,7 @@ int CP_CheckQuick(unsigned scancode)
 				lasttimecount = TimeCount;
 
 				if (MousePresent)
-					Mouse(MDelta);	// Clear accumulated mouse movement
+					//Mouse(MDelta);	// Clear accumulated mouse movement PORT
 				PM_CheckMainMem ();
 
 				#ifndef SPEAR
@@ -875,9 +876,9 @@ int CP_EndGame(void)
 
 	#pragma warn -sus
 	MainMenu[savegame].active = 0;
-	MainMenu[viewscores].routine=CP_ViewScores;
+	MainMenu[viewscores].routine=(void (*)(int w))CP_ViewScores;  // PORT add cast
 	#ifndef JAPAN
-	_fstrcpy(MainMenu[viewscores].string,STR_VS);
+	strcpy(MainMenu[viewscores].string,STR_VS);
 	#endif
 	#pragma warn +sus
 
@@ -1388,12 +1389,12 @@ int CP_LoadGame(int quick)
 		if (SaveGamesAvail[which])
 		{
 			name[7]=which+'0';
-			handle=open(name,O_BINARY);
-			lseek(handle,32,SEEK_SET);
-			loadedgame=true;
+			handle=_open(name,O_BINARY);
+			_lseek(handle,32,SEEK_SET);
+			loadedgame=True;
 			LoadTheGame(handle,0,0);
-			loadedgame=false;
-			close(handle);
+			loadedgame=False;
+			_close(handle);
 
 			DrawFace ();
 			DrawHealth ();
@@ -1423,14 +1424,14 @@ int CP_LoadGame(int quick)
 			ShootSnd();
 			name[7]=which+'0';
 
-			handle=open(name,O_BINARY);
-			lseek(handle,32,SEEK_SET);
+			handle=_open(name,O_BINARY);
+			_lseek(handle,32,SEEK_SET);
 
 			DrawLSAction(0);
-			loadedgame=true;
+			loadedgame=True;
 
 			LoadTheGame(handle,LSA_X+8,LSA_Y+5);
-			close(handle);
+			_close(handle);
 
 			StartGame=1;
 			ShootSnd();
@@ -1554,15 +1555,15 @@ int CP_SaveGame(int quick)
 		if (SaveGamesAvail[which])
 		{
 			name[7]=which+'0';
-			unlink(name);
-			handle=creat(name,S_IREAD|S_IWRITE);
+			_unlink(name);
+			handle=_creat(name,S_IREAD|S_IWRITE);
 
 			strcpy(input,&SaveGameNames[which][0]);
 
-			_dos_write(handle,(void far *)input,32,&nwritten);
-			lseek(handle,32,SEEK_SET);
+			//_dos_write(handle,(void *)input,32,&nwritten);
+			_lseek(handle,32,SEEK_SET);
 			SaveTheGame(handle,0,0);
-			close(handle);
+			_close(handle);
 
 			return 1;
 		}
@@ -1611,20 +1612,20 @@ int CP_SaveGame(int quick)
 				VWB_Bar(LSM_X+LSItems.indent+1,LSM_Y+which*13+1,LSM_W-LSItems.indent-16,10,BKGDCOLOR);
 			VW_UpdateScreen();
 
-			if (US_LineInput(LSM_X+LSItems.indent+2,LSM_Y+which*13+1,input,input,true,31,LSM_W-LSItems.indent-30))
+			if (US_LineInput(LSM_X+LSItems.indent+2,LSM_Y+which*13+1,input,input,True,31,LSM_W-LSItems.indent-30))
 			{
 				SaveGamesAvail[which]=1;
 				strcpy(&SaveGameNames[which][0],input);
 
-				unlink(name);
-				handle=creat(name,S_IREAD|S_IWRITE);
-				_dos_write(handle,(void far *)input,32,&nwritten);
-				lseek(handle,32,SEEK_SET);
+				_unlink(name);
+				handle=_creat(name,S_IREAD|S_IWRITE);
+				//_dos_write(handle,(void *)input,32,&nwritten); // PORT
+				_lseek(handle,32,SEEK_SET);
 
 				DrawLSAction(1);
 				SaveTheGame(handle,LSA_X+8,LSA_Y+5);
 
-				close(handle);
+				_close(handle);
 
 				ShootSnd();
 				exit=1;
@@ -1780,19 +1781,19 @@ void CP_Control(void)
 		switch(which)
 		{
 			case MOUSEENABLE:
-				mouseenabled^=1;
-				_CX=_DX=CENTER;
-				Mouse(4);
+				mouseenabled = (boolean)(mouseenabled ^ 1); // PORT
+				/*_CX=_DX=CENTER;
+				Mouse(4);*/
 				DrawCtlScreen();
 				CusItems.curpos=-1;
 				ShootSnd();
 				break;
 
 			case JOYENABLE:
-				joystickenabled^=1;
+				joystickenabled = (boolean)(joystickenabled ^ 1); // PORT
 				if (joystickenabled)
 					if (!CalibrateJoystick())
-						joystickenabled = 0;
+						joystickenabled = False;
 				DrawCtlScreen();
 				CusItems.curpos=-1;
 				ShootSnd();
@@ -1805,7 +1806,7 @@ void CP_Control(void)
 				break;
 
 			case PADENABLE:
-				joypadenabled^=1;
+				joypadenabled = (boolean)(joypadenabled ^ 1); // PORT
 				DrawCtlScreen();
 				ShootSnd();
 				break;
@@ -2179,7 +2180,7 @@ void EnterCtrlData(int index,CustomCtrls *cust,void (*DrawRtn)(int),void (*Print
 	if (IN_KeyDown(sc_Enter)||IN_KeyDown(sc_Control)||IN_KeyDown(sc_Alt))
 	{
 	 IN_ClearKeysDown();
-	 ci.button0=ci.button1=false;
+	 ci.button0=ci.button1=False;
 	}
 
   //
@@ -2225,8 +2226,8 @@ void EnterCtrlData(int index,CustomCtrls *cust,void (*DrawRtn)(int),void (*Print
 	switch(type)
 	{
 	 case MOUSE:
-	   Mouse(3);
-	   button=_BX;
+	   /*Mouse(3); // PORT
+	   button=_BX;*/
 	   switch(button)
 	   {
 	case 1: result=1; break;
@@ -3028,7 +3029,7 @@ void DrawOutline(int x,int y,int w,int h,int color1,int color2)
 ////////////////////////////////////////////////////////////////////
 void SetupControlPanel(void)
 {
-	struct ffblk f;
+	//struct ffblk f;
 	char name[13];
 	int which,i;
 
@@ -3056,7 +3057,8 @@ void SetupControlPanel(void)
 	// SEE WHICH SAVE GAME FILES ARE AVAILABLE & READ STRING IN
 	//
 	strcpy(name,SaveName);
-	if (!findfirst(name,&f,0))
+	// PORT
+	/*if (!findfirst(name,&f,0))
 		do
 		{
 			which=f.ff_name[7]-'0';
@@ -3071,13 +3073,14 @@ void SetupControlPanel(void)
 				close(handle);
 				strcpy(&SaveGameNames[which][0],temp);
 			}
-		} while(!findnext(&f));
+		} while(!findnext(&f))*/;
 
 	//
 	// CENTER MOUSE
 	//
-	_CX=_DX=CENTER;
-	Mouse(4);
+	// PORT
+	/*_CX=_DX=CENTER;
+	Mouse(4);*/
 }
 
 
@@ -3103,7 +3106,7 @@ void CleanupControlPanel(void)
 // Handle moving gun around a menu
 //
 ////////////////////////////////////////////////////////////////////
-int HandleMenu(CP_iteminfo *item_i,CP_itemtype far *items,void (*routine)(int w))
+int HandleMenu(CP_iteminfo *item_i,CP_itemtype *items,void (*routine)(int w))
 {
 	char key;
 	static int redrawitem=1,lastitem=-1;
@@ -3349,7 +3352,7 @@ int HandleMenu(CP_iteminfo *item_i,CP_itemtype far *items,void (*routine)(int w)
 //
 // ERASE GUN & DE-HIGHLIGHT STRING
 //
-void EraseGun(CP_iteminfo *item_i,CP_itemtype far *items,int x,int y,int which)
+void EraseGun(CP_iteminfo *item_i,CP_itemtype *items,int x,int y,int which)
 {
 	VWB_Bar(x-1,y,25,16,BKGDCOLOR);
 	SetTextColor(items+which,0);
@@ -3377,7 +3380,7 @@ void DrawHalfStep(int x,int y)
 //
 // DRAW GUN AT NEW POSITION
 //
-void DrawGun(CP_iteminfo *item_i,CP_itemtype far *items,int x,int *y,int which,int basey,void (*routine)(int w))
+void DrawGun(CP_iteminfo *item_i,CP_itemtype *items,int x,int *y,int which,int basey,void (*routine)(int w))
 {
 	VWB_Bar(x-1,*y,25,16,BKGDCOLOR);
 	*y=basey+which*13;
@@ -3420,7 +3423,7 @@ void TicDelay(int count)
 // Draw a menu
 //
 ////////////////////////////////////////////////////////////////////
-void DrawMenu(CP_iteminfo *item_i,CP_itemtype far *items)
+void DrawMenu(CP_iteminfo *item_i,CP_itemtype *items)
 {
 	int i,which=item_i->curpos;
 
@@ -3454,7 +3457,7 @@ void DrawMenu(CP_iteminfo *item_i,CP_itemtype far *items)
 // SET TEXT COLOR (HIGHLIGHT OR NO)
 //
 ////////////////////////////////////////////////////////////////////
-void SetTextColor(CP_itemtype far *items,int hlight)
+void SetTextColor(CP_itemtype *items,int hlight)
 {
 	if (hlight)
 		{SETFONTCOLOR(color_hlite[items->active],BKGDCOLOR);}
@@ -3503,48 +3506,48 @@ void ReadAnyControl(ControlInfo *ci)
 		// HOME MOUSE
 		// CHECK MOUSE BUTTONS
 
-		Mouse(3);
+		/*Mouse(3);
 		mousex=_CX;
-		mousey=_DX;
+		mousey=_DX;*/ // PORT
 
 		if (mousey<CENTER-SENSITIVE)
 		{
 			ci->dir=dir_North;
-			_CX=_DX=CENTER;
-			Mouse(4);
+			/*_CX=_DX=CENTER;
+			Mouse(4);*/ // PORT
 			mouseactive=1;
 		}
 		else
 		if (mousey>CENTER+SENSITIVE)
 		{
 			ci->dir=dir_South;
-			_CX=_DX=CENTER;
-			Mouse(4);
+			/*_CX=_DX=CENTER;
+			Mouse(4);*/ // PORT
 			mouseactive=1;
 		}
 
 		if (mousex<CENTER-SENSITIVE)
 		{
 			ci->dir=dir_West;
-			_CX=_DX=CENTER;
-			Mouse(4);
+			/*_CX=_DX=CENTER;
+			Mouse(4);*/ // PORT
 			mouseactive=1;
 		}
 		else
 		if (mousex>CENTER+SENSITIVE)
 		{
 			ci->dir=dir_East;
-			_CX=_DX=CENTER;
-			Mouse(4);
+			/*_CX=_DX=CENTER;
+			Mouse(4);*/ // PORT
 			mouseactive=1;
 		}
 
 		if (IN_MouseButtons())
 		{
-			ci->button0=IN_MouseButtons()&1;
-			ci->button1=IN_MouseButtons()&2;
-			ci->button2=IN_MouseButtons()&4;
-			ci->button3=false;
+			ci->button0=(boolean)(IN_MouseButtons()&1);
+			ci->button1=(boolean)(IN_MouseButtons()&2);
+			ci->button2=(boolean)(IN_MouseButtons()&4);
+			ci->button3=False;
 			mouseactive=1;
 		}
 	}
@@ -3570,15 +3573,15 @@ void ReadAnyControl(ControlInfo *ci)
 		jb=IN_JoyButtons();
 		if (jb)
 		{
-			ci->button0=jb&1;
-			ci->button1=jb&2;
+			ci->button0=(boolean)(jb&1);
+			ci->button1=(boolean)(jb&2);
 			if (joypadenabled)
 			{
-				ci->button2=jb&4;
-				ci->button3=jb&8;
+				ci->button2=(boolean)(jb&4);
+				ci->button3=(boolean)(jb&8);
 			}
 			else
-				ci->button2=ci->button3=false;
+				ci->button2=ci->button3=False;
 		}
 	}
 }
@@ -3589,7 +3592,7 @@ void ReadAnyControl(ControlInfo *ci)
 // DRAW DIALOG AND CONFIRM YES OR NO TO QUESTION
 //
 ////////////////////////////////////////////////////////////////////
-int Confirm(char far *string)
+int Confirm(char *string)
 {
 	int xit=0,i,x,y,tick=0,time,whichsnd[2]={ESCPRESSEDSND,SHOOTSND};
 
@@ -3655,7 +3658,7 @@ int Confirm(char far *string)
 	#endif
 
 	IN_ClearKeysDown();
-	SD_PlaySound(whichsnd[xit]);
+	SD_PlaySound((soundnames)whichsnd[xit]);
 	return xit;
 }
 
@@ -3721,17 +3724,17 @@ int GetYorN(int x,int y,int pic)
 // PRINT A MESSAGE IN A WINDOW
 //
 ////////////////////////////////////////////////////////////////////
-void Message(char far *string)
+void Message(char *string)
 {
 	int h=0,w=0,mw=0,i,x,y,time;
-	fontstruct _seg *font;
+	fontstruct *font;
 
 
 	CA_CacheGrChunk (STARTFONT+1);
 	fontnumber=1;
-	font=grsegs[STARTFONT+fontnumber];
+	font=(fontstruct *)grsegs[STARTFONT+fontnumber]; // PORT add cast
 	h=font->height;
-	for (i=0;i<_fstrlen(string);i++)
+	for (i=0;i<strlen(string);i++)
 		if (string[i]=='\n')
 		{
 			if (w>mw)
@@ -3772,17 +3775,19 @@ void StartCPMusic(int song)
 	lastmusic = song;
 
 	SD_MusicOff();
-	chunk =	song;
+	chunk =	(musicnames)song; // PORT cast
 
-	MM_BombOnError (false);
+	MM_BombOnError (False);
 	CA_CacheAudioChunk(STARTMUSIC + chunk);
-	MM_BombOnError (true);
-	if (mmerror)
-		mmerror = false;
-	else
+	MM_BombOnError (True);
+	// PORT
+	/*if (mmerror)
+		mmerror = False;
+	else*/
 	{
-		MM_SetLock(&((memptr)audiosegs[STARTMUSIC + chunk]),true);
-		SD_StartMusic((MusicGroup far *)audiosegs[STARTMUSIC + chunk]);
+		// PORT
+		/*MM_SetLock(&((memptr)audiosegs[STARTMUSIC + chunk]),True);
+		SD_StartMusic((MusicGroup *)audiosegs[STARTMUSIC + chunk]);*/
 	}
 }
 
@@ -3799,11 +3804,11 @@ void FreeMusic (void)
 //		specified scan code
 //
 ///////////////////////////////////////////////////////////////////////////
-byte *
+char *
 IN_GetScanName(ScanCode scan)
 {
-	byte		**p;
-	ScanCode	far *s;
+	char		**p;
+	ScanCode	*s;
 
 	for (s = ExtScanCodes,p = ExtScanNames;*s;p++,s++)
 		if (*s == scan)
@@ -3831,7 +3836,7 @@ void CheckPause(void)
 		SoundStatus^=1;
 		VW_WaitVBL(3);
 		IN_ClearKeysDown();
-		Paused=false;
+		Paused=False;
  }
 }
 
@@ -3881,7 +3886,7 @@ void ShootSnd(void)
 ///////////////////////////////////////////////////////////////////////////
 void CheckForEpisodes(void)
 {
-	struct ffblk f;
+	//struct ffblk f; // PORT
 
 //
 // JAPANESE VERSION
@@ -3916,7 +3921,7 @@ void CheckForEpisodes(void)
 //
 #ifndef UPLOAD
 #ifndef SPEAR
-	if (!findfirst("*.WL6",&f,FA_ARCH))
+	/*if (!findfirst("*.WL6",&f,FA_ARCH))
 	{
 		strcpy(extension,"WL6");
 		NewEmenu[2].active =
@@ -3939,7 +3944,7 @@ void CheckForEpisodes(void)
 		EpisodeSelect[1] =
 		EpisodeSelect[2] = 1;
 	}
-	else
+	else*/
 #endif
 #endif
 
@@ -3963,12 +3968,12 @@ void CheckForEpisodes(void)
 #endif
 
 #else
-	if (!findfirst("*.WL1",&f,FA_ARCH))
+	/*if (!findfirst("*.WL1",&f,FA_ARCH))
 	{
 		strcpy(extension,"WL1");
-	}
-	else
-		Quit("NO WOLFENSTEIN 3-D DATA FILES to be found!");
+	}*/
+	/*else
+		Quit("NO WOLFENSTEIN 3-D DATA FILES to be found!");*/
 #endif
 
 	strcat(configname,extension);

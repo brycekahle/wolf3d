@@ -70,10 +70,10 @@ boolean	CheckSight (objtype *ob);
 =
 = SpawnNewObj
 =
-= Spaws a new actor at the given TILE coordinates, with the given state, and
+= Spaws a New actor at the given TILE coordinates, with the given state, and
 = the given size in GLOBAL units.
 =
-= new			= a pointer to an initialized new actor
+= New			= a pointer to an initialized New actor
 =
 ===================
 */
@@ -81,21 +81,21 @@ boolean	CheckSight (objtype *ob);
 void SpawnNewObj (unsigned tilex, unsigned tiley, statetype *state)
 {
 	GetNewActor ();
-	new->state = state;
+	New->state = state;
 	if (state->tictime)
-		new->ticcount = US_RndT () % state->tictime;
+		New->ticcount = US_RndT () % state->tictime;
 	else
-		new->ticcount = 0;
+		New->ticcount = 0;
 
-	new->tilex = tilex;
-	new->tiley = tiley;
-	new->x = ((long)tilex<<TILESHIFT)+TILEGLOBAL/2;
-	new->y = ((long)tiley<<TILESHIFT)+TILEGLOBAL/2;
-	new->dir = nodir;
+	New->tilex = tilex;
+	New->tiley = tiley;
+	New->x = ((long)tilex<<TILESHIFT)+TILEGLOBAL/2;
+	New->y = ((long)tiley<<TILESHIFT)+TILEGLOBAL/2;
+	New->dir = nodir;
 
-	actorat[tilex][tiley] = new;
-	new->areanumber =
-		*(mapsegs[0] + farmapylookup[new->tiley]+new->tilex) - AREATILE;
+	actorat[tilex][tiley] = New;
+	New->areanumber =
+		*(mapsegs[0] + farmapylookup[New->tiley]+New->tilex) - AREATILE;
 }
 
 
@@ -105,7 +105,7 @@ void SpawnNewObj (unsigned tilex, unsigned tiley, statetype *state)
 =
 = NewState
 =
-= Changes ob to a new state, setting ticcount to the max for that state
+= Changes ob to a New state, setting ticcount to the max for that state
 =
 ===================
 */
@@ -138,7 +138,7 @@ void NewState (objtype *ob, statetype *state)
 =
 = If move is either clear or blocked only by a door, returns TRUE and sets
 =
-= ob->tilex			= new destination
+= ob->tilex			= New destination
 = ob->tiley
 = ob->areanumber    = the floor tile number (0-(NUMAREAS-1)) of destination
 = ob->distance  	= TILEGLOBAl, or -doornumber if a door is blocking the way
@@ -157,9 +157,9 @@ void NewState (objtype *ob, statetype *state)
 	if (temp)                                       \
 	{                                               \
 		if (temp<256)                               \
-			return false;                           \
+			return False;                           \
 		if (((objtype *)temp)->flags&FL_SHOOTABLE)  \
-			return false;                           \
+			return False;                           \
 	}                                               \
 }
 
@@ -169,11 +169,11 @@ void NewState (objtype *ob, statetype *state)
 	if (temp)                                       \
 	{                                               \
 		if (temp<128)                               \
-			return false;                           \
+			return False;                           \
 		if (temp<256)                               \
 			doornum = temp&63;                      \
 		else if (((objtype *)temp)->flags&FL_SHOOTABLE)\
-			return false;                           \
+			return False;                           \
 	}                                               \
 }
 
@@ -310,7 +310,7 @@ boolean TryWalk (objtype *ob)
 			break;
 
 		case nodir:
-			return false;
+			return False;
 
 		default:
 			Quit ("Walk: Bad dir");
@@ -320,7 +320,7 @@ boolean TryWalk (objtype *ob)
 	{
 		OpenDoor (doornum);
 		ob->distance = -doornum-1;
-		return true;
+		return True;
 	}
 
 
@@ -328,7 +328,7 @@ boolean TryWalk (objtype *ob)
 		*(mapsegs[0] + farmapylookup[ob->tiley]+ob->tilex) - AREATILE;
 
 	ob->distance = TILEGLOBAL;
-	return true;
+	return True;
 }
 
 
@@ -347,9 +347,9 @@ boolean TryWalk (objtype *ob)
 =
 = Otherwise
 =
-= ob->dir			= new direction to follow
+= ob->dir			= New direction to follow
 = ob->distance		= TILEGLOBAL or -doornumber
-= ob->tilex			= new destination
+= ob->tilex			= New destination
 = ob->tiley
 = ob->areanumber    = the floor tile number (0-(NUMAREAS-1)) of destination
 =
@@ -650,7 +650,7 @@ void SelectRunDir (objtype *ob)
 = Actors are not allowed to move inside the player
 = Does NOT check to see if the move is tile map valid
 =
-= ob->x			= adjusted for new position
+= ob->x			= adjusted for New position
 = ob->y
 =
 =================
@@ -963,7 +963,7 @@ void KillActor (objtype *ob)
 
 void DamageActor (objtype *ob, unsigned damage)
 {
-	madenoise = true;
+	madenoise = True;
 
 //
 // do double damage if shooting a non attack mode actor
@@ -1029,7 +1029,7 @@ void DamageActor (objtype *ob, unsigned damage)
 =
 = CheckLine
 =
-= Returns true if a straight line between the player and ob is unobstructed
+= Returns True if a straight line between the player and ob is unobstructed
 =
 =====================
 */
@@ -1096,7 +1096,7 @@ boolean CheckLine (objtype *ob)
 				continue;
 
 			if (value<128 || value>256)
-				return false;
+				return False;
 
 			//
 			// see if the door is open enough
@@ -1105,7 +1105,7 @@ boolean CheckLine (objtype *ob)
 			intercept = yfrac-ystep/2;
 
 			if (intercept>doorposition[value])
-				return false;
+				return False;
 
 		} while (x != xt2);
 	}
@@ -1150,7 +1150,7 @@ boolean CheckLine (objtype *ob)
 				continue;
 
 			if (value<128 || value>256)
-				return false;
+				return False;
 
 			//
 			// see if the door is open enough
@@ -1159,11 +1159,11 @@ boolean CheckLine (objtype *ob)
 			intercept = xfrac-xstep/2;
 
 			if (intercept>doorposition[value])
-				return false;
+				return False;
 		} while (y != yt2);
 	}
 
-	return true;
+	return True;
 }
 
 
@@ -1177,7 +1177,7 @@ boolean CheckLine (objtype *ob)
 =
 = If the sight is ok, check alertness and angle to see if they notice
 =
-= returns true if the player has been spoted
+= returns True if the player has been spoted
 =
 ================
 */
@@ -1192,7 +1192,7 @@ boolean CheckSight (objtype *ob)
 // don't bother tracing a line if the area isn't connected to the player's
 //
 	if (!areabyplayer[ob->areanumber])
-		return false;
+		return False;
 
 //
 // if the player is real close, sight is automatic
@@ -1202,7 +1202,7 @@ boolean CheckSight (objtype *ob)
 
 	if (deltax > -MINSIGHT && deltax < MINSIGHT
 	&& deltay > -MINSIGHT && deltay < MINSIGHT)
-		return true;
+		return True;
 
 //
 // see if they are looking in the right direction
@@ -1211,22 +1211,22 @@ boolean CheckSight (objtype *ob)
 	{
 	case north:
 		if (deltay > 0)
-			return false;
+			return False;
 		break;
 
 	case east:
 		if (deltax < 0)
-			return false;
+			return False;
 		break;
 
 	case south:
 		if (deltay < 0)
-			return false;
+			return False;
 		break;
 
 	case west:
 		if (deltax > 0)
-			return false;
+			return False;
 		break;
 	}
 
@@ -1394,7 +1394,7 @@ void FirstSighting (objtype *ob)
 =
 = Called by actors that ARE NOT chasing the player.  If the player
 = is detected (by sight, noise, or proximity), the actor is put into
-= it's combat frame and true is returned.
+= it's combat frame and True is returned.
 =
 = Incorporates a random reaction delay
 =
@@ -1413,24 +1413,24 @@ boolean SightPlayer (objtype *ob)
 	//
 		ob->temp2 -= tics;
 		if (ob->temp2 > 0)
-			return false;
+			return False;
 		ob->temp2 = 0;					// time to react
 	}
 	else
 	{
 		if (!areabyplayer[ob->areanumber])
-			return false;
+			return False;
 
 		if (ob->flags & FL_AMBUSH)
 		{
 			if (!CheckSight (ob))
-				return false;
+				return False;
 			ob->flags &= ~FL_AMBUSH;
 		}
 		else
 		{
 			if (!madenoise && !CheckSight (ob))
-				return false;
+				return False;
 		}
 
 
@@ -1469,12 +1469,12 @@ boolean SightPlayer (objtype *ob)
 			ob->temp2 = 1;
 			break;
 		}
-		return false;
+		return False;
 	}
 
 	FirstSighting (ob);
 
-	return true;
+	return True;
 }
 
 

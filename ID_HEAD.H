@@ -13,7 +13,9 @@
 
 #include "VERSION.H"
 
-typedef	enum	{false,true}	boolean;
+#define asm __asm
+
+typedef	enum	{False,True}	boolean;
 typedef	unsigned	char		byte;
 typedef	unsigned	int			word;
 typedef	unsigned	long		longword;

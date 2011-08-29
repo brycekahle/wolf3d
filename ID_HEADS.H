@@ -1,26 +1,26 @@
 // ID_GLOB.H
 
 
-#include <ALLOC.H>
+//#include <ALLOC.H>
 #include <CTYPE.H>
 #include <DOS.H>
 #include <ERRNO.H>
 #include <FCNTL.H>
 #include <IO.H>
-#include <MEM.H>
+//#include <MEM.H>
 #include <PROCESS.H>
 #include <STDIO.H>
 #include <STDLIB.H>
 #include <STRING.H>
 #include <SYS\STAT.H>
-#include <VALUES.H>
-#include <DIR.H>
+//#include <VALUES.H>
+//#include <DIR.H>
 #define __ID_GLOB__
 #include "VERSION.H"
 
 //--------------------------------------------------------------------------
 
-extern	char		far signon;
+extern	unsigned char		signon;
 
 #define	introscn	signon
 
@@ -56,7 +56,7 @@ extern	char		far signon;
 #endif
 //-----------------
 
-
+#define asm __asm
 #define GREXT	"VGA"
 
 //
@@ -65,7 +65,7 @@ extern	char		far signon;
 //	v1.0d1
 //
 
-typedef	enum	{false,true}	boolean;
+typedef enum {False, True}		boolean;
 typedef	unsigned	char		byte;
 typedef	unsigned	int			word;
 typedef	unsigned	long		longword;

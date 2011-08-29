@@ -1,3 +1,5 @@
+#include "ID_HEAD.H"
+
 ///////////////////////////////////////////////////////////////////////////
 //
 //	SDL_CheckSB() - Checks to see if a SoundBlaster resides at a
@@ -9,9 +11,9 @@ SDL_CheckSB(int port)
 {
 	int	i;
 
-	sbLocation = port << 4;		// Initialize stuff for later use
+	//sbLocation = port << 4;		// Initialize stuff for later use
 
-	sbOut(sbReset,true);		// Reset the SoundBlaster DSP
+	//sbOut(sbReset,True);		// Reset the SoundBlaster DSP
 asm	mov	dx,0x388				// Wait >4usec
 asm	in	al, dx
 asm	in	al, dx
@@ -23,7 +25,7 @@ asm	in	al, dx
 asm	in	al, dx
 asm	in	al, dx
 
-	sbOut(sbReset,false);		// Turn off sb DSP reset
+	//sbOut(sbReset,False);		// Turn off sb DSP reset
 asm	mov	dx,0x388				// Wait >100usec
 asm	mov	cx,100
 usecloop:
@@ -35,16 +37,16 @@ asm	loop usecloop
 		if (sbIn(sbDataAvail) & 0x80)		// If data is available...
 		{
 			if (sbIn(sbReadData) == 0xaa)	// If it matches correct value
-				return(true);
+				return(True);
 			else
 			{
 				sbLocation = -1;			// Otherwise not a SoundBlaster
-				return(false);
+				return(False);
 			}
 		}
 	}
 	sbLocation = -1;						// Retry count exceeded - fail
-	return(false);
+	return(False);
 }
 
 ///////////////////////////////////////////////////////////////////////////
@@ -65,10 +67,10 @@ SDL_DetectSoundBlaster(int port)
 	if (port == -1)
 	{
 		if (SDL_CheckSB(2))			// Check default before scanning
-			return(true);
+			return(True);
 
 		if (SDL_CheckSB(4))			// Check other SB Pro location before scan
-			return(true);
+			return(True);
 
 		for (i = 1;i <= 6;i++)		// Scan through possible SB locations
 		{
@@ -76,9 +78,9 @@ SDL_DetectSoundBlaster(int port)
 				continue;
 
 			if (SDL_CheckSB(i))		// If found at this address,
-				return(true);		//	return success
+				return(True);		//	return success
 		}
-		return(false);				// All addresses failed, return failure
+		return(False);				// All addresses failed, return failure
 	}
 	else
 		return(SDL_CheckSB(port));	// User specified address or default

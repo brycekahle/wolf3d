@@ -22,7 +22,7 @@ byte	update[UPDATEHIGH][UPDATEWIDE];
 
 //==========================================================================
 
-pictabletype	_seg *pictable;
+pictabletype	*pictable;
 
 
 int	px,py;
@@ -37,26 +37,26 @@ void	VWL_UpdateScreenBlocks (void);
 
 //==========================================================================
 
-void VW_DrawPropString (char far *string)
+void VW_DrawPropString (char *string)
 {
-	fontstruct	far	*font;
+	fontstruct	*font;
 	int		width,step,height,i;
-	byte	far *source, far *dest, far *origdest;
+	byte	*source, *dest, *origdest;
 	byte	ch,mask;
 
-	font = (fontstruct far *)grsegs[STARTFONT+fontnumber];
+	font = (fontstruct *)grsegs[STARTFONT+fontnumber];
 	height = bufferheight = font->height;
-	dest = origdest = MK_FP(SCREENSEG,bufferofs+ylookup[py]+(px>>2));
+	//dest = origdest = MK_FP(SCREENSEG,bufferofs+ylookup[py]+(px>>2));
 	mask = 1<<(px&3);
 
 
 	while ((ch = *string++)!=0)
 	{
 		width = step = font->width[ch];
-		source = ((byte far *)font)+font->location[ch];
+		source = ((byte *)font)+font->location[ch];
 		while (width--)
 		{
-			VGAMAPMASK(mask);
+			//VGAMAPMASK(mask); // PORT
 
 asm	mov	ah,[BYTE PTR fontcolor]
 asm	mov	bx,[step]
@@ -93,26 +93,26 @@ bufferwidth = ((dest+1)-origdest)*4;
 }
 
 
-void VW_DrawColorPropString (char far *string)
+void VW_DrawColorPropString (char *string)
 {
-	fontstruct	far	*font;
+	fontstruct	*font;
 	int		width,step,height,i;
-	byte	far *source, far *dest, far *origdest;
+	byte	*source, *dest, *origdest;
 	byte	ch,mask;
 
-	font = (fontstruct far *)grsegs[STARTFONT+fontnumber];
+	font = (fontstruct *)grsegs[STARTFONT+fontnumber];
 	height = bufferheight = font->height;
-	dest = origdest = MK_FP(SCREENSEG,bufferofs+ylookup[py]+(px>>2));
+	//dest = origdest = MK_FP(SCREENSEG,bufferofs+ylookup[py]+(px>>2)); // PORT
 	mask = 1<<(px&3);
 
 
 	while ((ch = *string++)!=0)
 	{
 		width = step = font->width[ch];
-		source = ((byte far *)font)+font->location[ch];
+		source = ((byte *)font)+font->location[ch];
 		while (width--)
 		{
-			VGAMAPMASK(mask);
+			//VGAMAPMASK(mask); // PORT causes errors below this line
 
 asm	mov	ah,[BYTE PTR fontcolor]
 asm	mov	bx,[step]
@@ -167,10 +167,10 @@ bufferwidth = ((dest+1)-origdest)*4;
 =================
 */
 
-void VL_MungePic (byte far *source, unsigned width, unsigned height)
+void VL_MungePic (byte *source, unsigned width, unsigned height)
 {
 	unsigned	x,y,plane,size,pwidth;
-	byte		_seg *temp, far *dest, far *srcline;
+	byte		*temp, *dest, *srcline;
 
 	size = width*height;
 
@@ -181,7 +181,7 @@ void VL_MungePic (byte far *source, unsigned width, unsigned height)
 // copy the pic to a temp buffer
 //
 	MM_GetPtr (&(memptr)temp,size);
-	_fmemcpy (temp,source,size);
+	memcpy (temp,source,size);
 
 //
 // munge it back into the original buffer
@@ -203,22 +203,22 @@ void VL_MungePic (byte far *source, unsigned width, unsigned height)
 	MM_FreePtr (&(memptr)temp);
 }
 
-void VWL_MeasureString (char far *string, word *width, word *height
-	, fontstruct _seg *font)
+void VWL_MeasureString (char *string, word *width, word *height
+	, fontstruct *font)
 {
 	*height = font->height;
 	for (*width = 0;*string;string++)
-		*width += font->width[*((byte far *)string)];	// proportional width
+		*width += font->width[*((byte *)string)];	// proportional width
 }
 
-void	VW_MeasurePropString (char far *string, word *width, word *height)
+void	VW_MeasurePropString (char *string, word *width, word *height)
 {
-	VWL_MeasureString(string,width,height,(fontstruct _seg *)grsegs[STARTFONT+fontnumber]);
+	VWL_MeasureString(string,width,height,(fontstruct *)grsegs[STARTFONT+fontnumber]);
 }
 
-void	VW_MeasureMPropString  (char far *string, word *width, word *height)
+void	VW_MeasureMPropString  (char *string, word *width, word *height)
 {
-	VWL_MeasureString(string,width,height,(fontstruct _seg *)grsegs[STARTFONTM+fontnumber]);
+	VWL_MeasureString(string,width,height,(fontstruct *)grsegs[STARTFONTM+fontnumber]);
 }
 
 
@@ -290,14 +290,14 @@ int VW_MarkUpdateBlock (int x1, int y1, int x2, int y2)
 
 void VWB_DrawTile8 (int x, int y, int tile)
 {
-	if (VW_MarkUpdateBlock (x,y,x+7,y+7))
-		LatchDrawChar(x,y,tile);
+	//if (VW_MarkUpdateBlock (x,y,x+7,y+7))
+		//LatchDrawChar(x,y,tile); // PORT
 }
 
 void VWB_DrawTile8M (int x, int y, int tile)
 {
 	if (VW_MarkUpdateBlock (x,y,x+7,y+7))
-		VL_MemToScreen (((byte far *)grsegs[STARTTILE8M])+tile*64,8,8,x,y);
+		VL_MemToScreen (((byte *)grsegs[STARTTILE8M])+tile*64,8,8,x,y);
 }
 
 
@@ -312,12 +312,12 @@ void VWB_DrawPic (int x, int y, int chunknum)
 	height = pictable[picnum].height;
 
 	if (VW_MarkUpdateBlock (x,y,x+width-1,y+height-1))
-		VL_MemToScreen (grsegs[chunknum],width,height,x,y);
+		VL_MemToScreen ((byte *)grsegs[chunknum],width,height,x,y); // PORT cast
 }
 
 
 
-void VWB_DrawPropString	 (char far *string)
+void VWB_DrawPropString	 (char *string)
 {
 	int x;
 	x=px;
@@ -352,7 +352,7 @@ void VWB_Vlin (int y1, int y2, int x, int color)
 
 void VW_UpdateScreen (void)
 {
-	VH_UpdateScreen ();
+	//VH_UpdateScreen (); // PORT
 }
 
 
@@ -380,7 +380,7 @@ void LatchDrawPic (unsigned x, unsigned y, unsigned picnum)
 	height = pictable[picnum-STARTPICS].height;
 	source = latchpics[2+picnum-LATCHPICS_LUMP_START];
 
-	VL_LatchToScreen (source,wide/4,height,x*8,y);
+	//VL_LatchToScreen (source,wide/4,height,x*8,y); // PORT
 }
 
 
@@ -397,7 +397,7 @@ void LatchDrawPic (unsigned x, unsigned y, unsigned picnum)
 void LoadLatchMem (void)
 {
 	int	i,j,p,m,width,height,start,end;
-	byte	far *src;
+	byte	*src;
 	unsigned	destoff;
 
 //
@@ -405,7 +405,7 @@ void LoadLatchMem (void)
 //
 	latchpics[0] = freelatch;
 	CA_CacheGrChunk (STARTTILE8);
-	src = (byte _seg *)grsegs[STARTTILE8];
+	src = (byte *)grsegs[STARTTILE8];
 	destoff = freelatch;
 
 	for (i=0;i<NUMTILE8;i++)
@@ -420,13 +420,13 @@ void LoadLatchMem (void)
 //
 // tile 16s
 //
-	src = (byte _seg *)grsegs[STARTTILE16];
+	src = (byte *)grsegs[STARTTILE16];
 	latchpics[1] = destoff;
 
 	for (i=0;i<NUMTILE16;i++)
 	{
 		CA_CacheGrChunk (STARTTILE16+i);
-		src = (byte _seg *)grsegs[STARTTILE16+i];
+		src = (byte *)grsegs[STARTTILE16+i];
 		VL_MemToLatch (src,16,16,destoff);
 		destoff+=64;
 		if (src)
@@ -446,12 +446,12 @@ void LoadLatchMem (void)
 		CA_CacheGrChunk (i);
 		width = pictable[i-STARTPICS].width;
 		height = pictable[i-STARTPICS].height;
-		VL_MemToLatch (grsegs[i],width,height,destoff);
+		VL_MemToLatch ((byte *)grsegs[i],width,height,destoff); // PORT add cast
 		destoff += width/4 *height;
 		UNCACHEGRCHUNK(i);
 	}
 
-	EGAMAPMASK(15);
+	//EGAMAPMASK(15); // PORT damn thing causing errors
 }
 
 //==========================================================================
@@ -461,7 +461,7 @@ void LoadLatchMem (void)
 =
 = FizzleFade
 =
-= returns true if aborted
+= returns True if aborted
 =
 ===================
 */
@@ -488,7 +488,7 @@ boolean FizzleFade (unsigned source, unsigned dest,
 	do	// while (1)
 	{
 		if (abortable && IN_CheckAck () )
-			return true;
+			return True;
 
 		asm	mov	es,[screenseg]
 
@@ -526,9 +526,9 @@ noxor:
 			// copy one pixel
 			//
 			mask = x&3;
-			VGAREADMAP(mask);
+			//VGAREADMAP(mask);
 			mask = maskb[mask];
-			VGAMAPMASK(mask);
+			//VGAMAPMASK(mask);
 
 			asm	mov	di,[drawofs]
 			asm	mov	al,[es:di]
@@ -536,7 +536,7 @@ noxor:
 			asm	mov	[es:di],al
 
 			if (rndval == 1)		// entire sequence has been completed
-				return false;
+				return False;
 		}
 		frame++;
 		while (TimeCount<frame)		// don't go too fast

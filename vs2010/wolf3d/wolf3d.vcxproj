@@ -60,8 +60,6 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\CONTIGSC.C" />
-    <ClCompile Include="..\..\DETECT.C" />
     <ClCompile Include="..\..\ID_CA.C" />
     <ClCompile Include="..\..\ID_IN.C" />
     <ClCompile Include="..\..\ID_MM.C" />
@@ -71,7 +69,6 @@
     <ClCompile Include="..\..\ID_VH.C" />
     <ClCompile Include="..\..\ID_VL.C" />
     <ClCompile Include="..\..\MUNGE.C" />
-    <ClCompile Include="..\..\OLDSCALE.C" />
     <ClCompile Include="..\..\WL_ACT1.C" />
     <ClCompile Include="..\..\WL_ACT2.C" />
     <ClCompile Include="..\..\WL_AGENT.C" />

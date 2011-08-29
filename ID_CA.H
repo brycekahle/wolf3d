@@ -20,15 +20,15 @@ typedef	struct
 
 extern	char		audioname[13];
 
-extern	byte 		_seg	*tinf;
+extern	byte 		*tinf;
 extern	int			mapon;
 
-extern	unsigned	_seg	*mapsegs[MAPPLANES];
-extern	maptype		_seg	*mapheaderseg[NUMMAPS];
-extern	byte		_seg	*audiosegs[NUMSNDCHUNKS];
-extern	void		_seg	*grsegs[NUMCHUNKS];
+extern	unsigned	*mapsegs[MAPPLANES];
+extern	maptype		*mapheaderseg[NUMMAPS];
+extern	byte		*audiosegs[NUMSNDCHUNKS];
+extern	void		*grsegs[NUMCHUNKS];
 
-extern	byte		far	grneeded[NUMCHUNKS];
+extern	byte		grneeded[NUMCHUNKS];
 extern	byte		ca_levelbit,ca_levelnum;
 
 extern	char		*titleptr[8];
@@ -44,8 +44,8 @@ extern	char		extension[5],
 			aheadname[10],
 			afilename[10];
 
-extern long		_seg *grstarts;	// array of offsets in egagraph, -1 for sparse
-extern long		_seg *audiostarts;	// array of offsets in audio / audiot
+extern long		*grstarts;	// array of offsets in egagraph, -1 for sparse
+extern long		*audiostarts;	// array of offsets in audio / audiot
 //
 // hooks for custom cache dialogs
 //
@@ -64,16 +64,16 @@ void CAL_ShiftSprite (unsigned segment,unsigned source,unsigned dest,
 
 void CA_OpenDebug (void);
 void CA_CloseDebug (void);
-boolean CA_FarRead (int handle, byte far *dest, long length);
-boolean CA_FarWrite (int handle, byte far *source, long length);
+boolean CA_FarRead (int handle, byte *dest, long length);
+boolean CA_FarWrite (int handle, byte *source, long length);
 boolean CA_ReadFile (char *filename, memptr *ptr);
 boolean CA_LoadFile (char *filename, memptr *ptr);
-boolean CA_WriteFile (char *filename, void far *ptr, long length);
+boolean CA_WriteFile (char *filename, void *ptr, long length);
 
-long CA_RLEWCompress (unsigned huge *source, long length, unsigned huge *dest,
+long CA_RLEWCompress (unsigned *source, long length, unsigned *dest,
   unsigned rlewtag);
 
-void CA_RLEWexpand (unsigned huge *source, unsigned huge *dest,long length,
+void CA_RLEWexpand (unsigned *source, unsigned *dest,long length,
   unsigned rlewtag);
 
 void CA_Startup (void);

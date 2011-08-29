@@ -49,8 +49,8 @@ fixed	mindist		= MINDIST;
 // math tables
 //
 int			pixelangle[MAXVIEWWIDTH];
-long		far finetangent[FINEANGLES/4];
-fixed 		far sintable[ANGLES+ANGLES/4],far *costable = sintable+(ANGLES/4);
+long		finetangent[FINEANGLES/4];
+fixed 		sintable[ANGLES+ANGLES/4],*costable = sintable+(ANGLES/4);
 
 //
 // refresh variables
@@ -76,7 +76,7 @@ void	ThreeDRefresh (void);
 //
 // wall optimization variables
 //
-int		lastside;		// true for vertical
+int		lastside;		// True for vertical
 long	lastintercept;
 int		lasttilehit;
 
@@ -136,7 +136,7 @@ void AsmRefresh (void);			// in WL_DR_A.ASM
 ========================
 */
 
-#pragma warn -rvl			// I stick the return value in with ASMs
+//#pragma warn -rvl			// I stick the return value in with ASMs
 
 fixed FixedByFrac (fixed a, fixed b)
 {
@@ -180,7 +180,7 @@ ansok:;
 
 }
 
-#pragma warn +rvl
+//#pragma warn +rvl
 
 //==========================================================================
 
@@ -279,7 +279,7 @@ void TransformActor (objtype *ob)
 = sets:
 =   screenx,transx,transy,screenheight: projected edge location and size
 =
-= Returns true if the tile is withing getting distance
+= Returns True if the tile is withing getting distance
 =
 ========================
 */
@@ -317,7 +317,7 @@ boolean TransformTile (int tx, int ty, int *dispx, int *dispheight)
 	if (nx<mindist)			// too close, don't overflow the divide
 	{
 		*dispheight = 0;
-		return false;
+		return False;
 	}
 
 	*dispx = centerx + ny*scale/nx;	// DEBUG: use assembly divide
@@ -337,9 +337,9 @@ boolean TransformTile (int tx, int ty, int *dispx, int *dispheight)
 // see if it should be grabbed
 //
 	if (nx<TILEGLOBAL && ny>-TILEGLOBAL/2 && ny<TILEGLOBAL/2)
-		return true;
+		return True;
 	else
-		return false;
+		return False;
 }
 
 //==========================================================================
@@ -354,7 +354,7 @@ boolean TransformTile (int tx, int ty, int *dispx, int *dispheight)
 ====================
 */
 
-#pragma warn -rvl			// I stick the return value in with ASMs
+//#pragma warn -rvl			// I stick the return value in with ASMs
 
 int	CalcHeight (void)
 {
@@ -397,7 +397,7 @@ long		postsource;
 unsigned	postx;
 unsigned	postwidth;
 
-void	near ScalePost (void)		// VGA version
+void	ScalePost (void)		// VGA version
 {
 	asm	mov	ax,SCREENSEG
 	asm	mov	es,ax
@@ -511,7 +511,7 @@ void HitVertWall (void)
 		if (lastside != -1)				// if not the first scaled post
 			ScalePost ();
 
-		lastside = true;
+		lastside = True;
 		lastintercept = xtile;
 
 		lasttilehit = tilehit;
@@ -1132,10 +1132,10 @@ void DrawScaleds (void)
 		|| ( *(visspot+64) && !*(tilespot+64) )
 		|| ( *(visspot+63) && !*(tilespot+63) ) )
 		{
-			obj->active = true;
+			obj->active = True;
 			TransformActor (obj);
 			if (!obj->viewheight)
-				continue;						// too close or far away
+				continue;						// too close or away
 
 			visptr->viewx = obj->viewx;
 			visptr->viewheight = obj->viewheight;
@@ -1338,7 +1338,7 @@ void	ThreeDRefresh (void)
 	int tracedir;
 
 // this wouldn't need to be done except for my debugger/video wierdness
-	outportb (SC_INDEX,SC_MAPMASK);
+	//outportb (SC_INDEX,SC_MAPMASK); // PORT
 
 //
 // clear out the traced array
@@ -1370,8 +1370,8 @@ asm	rep stosw
 //
 	if (fizzlein)
 	{
-		FizzleFade(bufferofs,displayofs+screenofs,viewwidth,viewheight,20,false);
-		fizzlein = false;
+		FizzleFade(bufferofs,displayofs+screenofs,viewwidth,viewheight,20,False);
+		fizzlein = False;
 
 		lasttimecount = TimeCount = 0;		// don't make a big tic count
 

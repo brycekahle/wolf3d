@@ -261,7 +261,7 @@ Open doors conect two areas, so sounds will travel between them and sight
 Areaconnect is incremented/decremented by each door. If >0 they connect
 
 Every time a door opens or closes the areabyplayer matrix gets recalculated.
-	An area is true if it connects with the player's current spor.
+	An area is True if it connects with the player's current spor.
 
 =============================================================================
 */
@@ -275,7 +275,7 @@ int			doornum;
 unsigned	doorposition[MAXDOORS];		// leading edge of door 0=closed
 										// 0xffff = fully open
 
-byte		far areaconnect[NUMAREAS][NUMAREAS];
+byte		areaconnect[NUMAREAS][NUMAREAS];
 
 boolean		areabyplayer[NUMAREAS];
 
@@ -298,7 +298,7 @@ void RecursiveConnect (int areanumber)
 	{
 		if (areaconnect[areanumber][i] && !areabyplayer[i])
 		{
-			areabyplayer[i] = true;
+			areabyplayer[i] = True;
 			RecursiveConnect (i);
 		}
 	}
@@ -308,7 +308,7 @@ void RecursiveConnect (int areanumber)
 void ConnectAreas (void)
 {
 	memset (areabyplayer,0,sizeof(areabyplayer));
-	areabyplayer[player->areanumber] = true;
+	areabyplayer[player->areanumber] = True;
 	RecursiveConnect (player->areanumber);
 }
 
@@ -316,7 +316,7 @@ void ConnectAreas (void)
 void InitAreas (void)
 {
 	memset (areabyplayer,0,sizeof(areabyplayer));
-	areabyplayer[player->areanumber] = true;
+	areabyplayer[player->areanumber] = True;
 }
 
 
@@ -332,7 +332,7 @@ void InitAreas (void)
 void InitDoorList (void)
 {
 	memset (areabyplayer,0,sizeof(areabyplayer));
-	_fmemset (areaconnect,0,sizeof(areaconnect));
+	memset (areaconnect,0,sizeof(areaconnect));
 
 	lastdoorobj = &doorobjlist[0];
 	doornum = 0;
@@ -350,7 +350,7 @@ void InitDoorList (void)
 void SpawnDoor (int tilex, int tiley, boolean vertical, int lock)
 {
 	int	areanumber;
-	unsigned	far *map;
+	unsigned	*map;
 
 	if (doornum==64)
 		Quit ("64+ doors on level!");
@@ -362,7 +362,7 @@ void SpawnDoor (int tilex, int tiley, boolean vertical, int lock)
 	lastdoorobj->lock = lock;
 	lastdoorobj->action = dr_closed;
 
-	(unsigned)actorat[tilex][tiley] = doornum | 0x80;	// consider it a solid wall
+	actorat[tilex][tiley] = (objtype *)(doornum | 0x80);	// consider it a solid wall // PORT add objtype cast
 
 //
 // make the door tile a special tile, and mark the adjacent tiles
@@ -554,7 +554,7 @@ void DoorOpen (int door)
 void DoorOpening (int door)
 {
 	int		area1,area2;
-	unsigned	far	*map;
+	unsigned	*map;
 	long	position;
 
 	position = doorposition[door];
@@ -617,7 +617,7 @@ void DoorOpening (int door)
 void DoorClosing (int door)
 {
 	int		area1,area2,move;
-	unsigned	far	*map;
+	unsigned	*map;
 	long	position;
 	int		tilex,tiley;
 

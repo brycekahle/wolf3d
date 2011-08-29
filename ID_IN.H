@@ -17,7 +17,7 @@
 #define	MaxJoys		2
 #define	NumCodes	128
 
-typedef	byte		ScanCode;
+typedef	char		ScanCode;
 #define	sc_None			0
 #define	sc_Bad			0xff
 #define	sc_Return		0x1c
@@ -164,12 +164,12 @@ extern	JoystickDef	JoyDefs[];
 extern	ControlType	Controls[MaxPlayers];
 
 extern	Demo		DemoMode;
-extern	byte _seg	*DemoBuffer;
+extern	byte		*DemoBuffer;
 extern	word		DemoOffset,DemoSize;
 
 // Function prototypes
 #define	IN_KeyDown(code)	(Keyboard[(code)])
-#define	IN_ClearKey(code)	{Keyboard[code] = false;\
+#define	IN_ClearKey(code)	{Keyboard[code] = False;\
 							if (code == LastScan) LastScan = sc_None;}
 
 // DEBUG - put names in prototypes
@@ -189,7 +189,7 @@ extern	boolean		IN_UserInput(longword delay);
 extern	char		IN_WaitForASCII(void);
 extern	ScanCode	IN_WaitForKey(void);
 extern	word		IN_GetJoyButtonsDB(word joy);
-extern	byte		*IN_GetScanName(ScanCode);
+extern	char		*IN_GetScanName(ScanCode);
 
 
 byte	IN_MouseButtons (void);

@@ -54,8 +54,8 @@ objtype		*LastAttacker;
 void	T_Player (objtype *ob);
 void	T_Attack (objtype *ob);
 
-statetype s_player = {false,0,0,T_Player,NULL,NULL};
-statetype s_attack = {false,0,0,T_Attack,NULL,NULL};
+statetype s_player = {False,0,0,T_Player,NULL,NULL};
+statetype s_attack = {False,0,0,T_Attack,NULL,NULL};
 
 
 long	playerxmove,playerymove;
@@ -776,7 +776,7 @@ void GetBonus (statobj_t *check)
 		break;
 
 	case	bo_spear:
-		spearflag = true;
+		spearflag = True;
 		spearx = player->x;
 		speary = player->y;
 		spearangle = player->angle;
@@ -793,7 +793,7 @@ void GetBonus (statobj_t *check)
 =
 = TryMove
 =
-= returns true if move ok
+= returns True if move ok
 = debug: use pointers to optimize
 ===================
 */
@@ -818,7 +818,7 @@ boolean TryMove (objtype *ob)
 		{
 			check = actorat[x][y];
 			if (check && check<objlist)
-				return false;
+				return False;
 		}
 
 //
@@ -847,11 +847,11 @@ boolean TryMove (objtype *ob)
 				if (deltay < -MINACTORDIST || deltay > MINACTORDIST)
 					continue;
 
-				return false;
+				return False;
 			}
 		}
 
-	return true;
+	return True;
 }
 
 
@@ -913,7 +913,7 @@ void VictoryTile (void)
 	SpawnBJVictory ();
 #endif
 
-	gamestate.victoryflag = true;
+	gamestate.victoryflag = True;
 }
 
 
@@ -982,7 +982,7 @@ void Thrust (int angle, long speed)
 
 void Cmd_Fire (void)
 {
-	buttonheld[bt_attack] = true;
+	buttonheld[bt_attack] = True;
 
 	gamestate.weaponframe = 0;
 
@@ -1020,28 +1020,28 @@ void Cmd_Use (void)
 		checkx = player->tilex + 1;
 		checky = player->tiley;
 		dir = di_east;
-		elevatorok = true;
+		elevatorok = True;
 	}
 	else if (player->angle < 3*ANGLES/8)
 	{
 		checkx = player->tilex;
 		checky = player->tiley-1;
 		dir = di_north;
-		elevatorok = false;
+		elevatorok = False;
 	}
 	else if (player->angle < 5*ANGLES/8)
 	{
 		checkx = player->tilex - 1;
 		checky = player->tiley;
 		dir = di_west;
-		elevatorok = true;
+		elevatorok = True;
 	}
 	else
 	{
 		checkx = player->tilex;
 		checky = player->tiley + 1;
 		dir = di_south;
-		elevatorok = false;
+		elevatorok = False;
 	}
 
 	doornum = tilemap[checkx][checky];
@@ -1059,7 +1059,7 @@ void Cmd_Use (void)
 	//
 	// use elevator
 	//
-		buttonheld[bt_use] = true;
+		buttonheld[bt_use] = True;
 
 		tilemap[checkx][checky]++;		// flip switch
 		if (*(mapsegs[0]+farmapylookup[player->tiley]+player->tilex) == ALTELEVATORTILE)
@@ -1071,7 +1071,7 @@ void Cmd_Use (void)
 	}
 	else if (!buttonheld[bt_use] && doornum & 0x80)
 	{
-		buttonheld[bt_use] = true;
+		buttonheld[bt_use] = True;
 		OperateDoor (doornum & ~0x80);
 	}
 	else
@@ -1100,7 +1100,7 @@ void Cmd_Use (void)
 void SpawnPlayer (int tilex, int tiley, int dir)
 {
 	player->obclass = playerobj;
-	player->active = true;
+	player->active = True;
 	player->tilex = tilex;
 	player->tiley = tiley;
 	player->areanumber =
@@ -1185,7 +1185,7 @@ void	GunAttack (objtype *ob)
 		break;
 	}
 
-	madenoise = true;
+	madenoise = True;
 
 //
 // find potential targets
@@ -1303,10 +1303,10 @@ void	T_Attack (objtype *ob)
 	}
 
 	if ( buttonstate[bt_use] && !buttonheld[bt_use] )
-		buttonstate[bt_use] = false;
+		buttonstate[bt_use] = False;
 
 	if ( buttonstate[bt_attack] && !buttonheld[bt_attack])
-		buttonstate[bt_attack] = false;
+		buttonstate[bt_attack] = False;
 
 	ControlMovement (ob);
 	if (gamestate.victoryflag)		// watching the BJ actor

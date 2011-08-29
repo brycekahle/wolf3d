@@ -22,13 +22,13 @@
 =============================================================================
 */
 
-boolean		madenoise;					// true when shooting or screaming
+boolean		madenoise;					// True when shooting or screaming
 
 exit_t		playstate;
 
 int			DebugOk;
 
-objtype 	objlist[MAXACTORS],*new,*obj,*player,*lastobj,
+objtype 	objlist[MAXACTORS],*New,*obj,*player,*lastobj,
 			*objfreelist,*killerobj;
 
 unsigned	farmapylookup[MAPSIZE];
@@ -68,7 +68,7 @@ int			viewsize;
 boolean		buttonheld[NUMBUTTONS];
 
 boolean		demorecord,demoplayback;
-char		far *demoptr, far *lastdemoptr;
+char		*demoptr, *lastdemoptr;
 memptr		demobuffer;
 
 //
@@ -264,7 +264,7 @@ void PollKeyboardButtons (void)
 
 	for (i=0;i<NUMBUTTONS;i++)
 		if (Keyboard[buttonscan[i]])
-			buttonstate[i] = true;
+			buttonstate[i] = True;
 }
 
 
@@ -283,11 +283,11 @@ void PollMouseButtons (void)
 	buttons = IN_MouseButtons ();
 
 	if (buttons&1)
-		buttonstate[buttonmouse[0]] = true;
+		buttonstate[buttonmouse[0]] = True;
 	if (buttons&2)
-		buttonstate[buttonmouse[1]] = true;
+		buttonstate[buttonmouse[1]] = True;
 	if (buttons&4)
-		buttonstate[buttonmouse[2]] = true;
+		buttonstate[buttonmouse[2]] = True;
 }
 
 
@@ -309,22 +309,22 @@ void PollJoystickButtons (void)
 	if (joystickport && !joypadenabled)
 	{
 		if (buttons&4)
-			buttonstate[buttonjoy[0]] = true;
+			buttonstate[buttonjoy[0]] = True;
 		if (buttons&8)
-			buttonstate[buttonjoy[1]] = true;
+			buttonstate[buttonjoy[1]] = True;
 	}
 	else
 	{
 		if (buttons&1)
-			buttonstate[buttonjoy[0]] = true;
+			buttonstate[buttonjoy[0]] = True;
 		if (buttons&2)
-			buttonstate[buttonjoy[1]] = true;
+			buttonstate[buttonjoy[1]] = True;
 		if (joypadenabled)
 		{
 			if (buttons&4)
-				buttonstate[buttonjoy[2]] = true;
+				buttonstate[buttonjoy[2]] = True;
 			if (buttons&8)
-				buttonstate[buttonjoy[3]] = true;
+				buttonstate[buttonjoy[3]] = True;
 		}
 	}
 }
@@ -377,9 +377,9 @@ void PollMouseMove (void)
 {
 	int	mousexmove,mouseymove;
 
-	Mouse(MDelta);
-	mousexmove = _CX;
-	mouseymove = _DX;
+	//Mouse(MDelta); // PORT
+	//mousexmove = _CX;
+	//mouseymove = _DX;
 
 	controlx += mousexmove*10/(13-mouseadjustment);
 	controly += mouseymove*20/(13-mouseadjustment);
@@ -758,9 +758,9 @@ void CheckKeys (void)
 		IN_Ack();
 		IN_ClearKeysDown ();
 		SD_MusicOn();
-		Paused = false;
-		if (MousePresent)
-			Mouse(MDelta);	// Clear accumulated mouse movement
+		Paused = False;
+		//if (MousePresent) // PORT
+		//	Mouse(MDelta);	// Clear accumulated mouse movement
 		return;
 	}
 
@@ -811,8 +811,8 @@ void CheckKeys (void)
 		if (loadedgame)
 			playstate = ex_abort;
 		lasttimecount = TimeCount;
-		if (MousePresent)
-			Mouse(MDelta);	// Clear accumulated mouse movement
+		//if (MousePresent) // PORT
+		//	Mouse(MDelta);	// Clear accumulated mouse movement
 		PM_CheckMainMem ();
 		return;
 	}
@@ -826,8 +826,8 @@ void CheckKeys (void)
 		fontnumber=0;
 		SETFONTCOLOR(0,15);
 		DebugKeys();
-		if (MousePresent)
-			Mouse(MDelta);	// Clear accumulated mouse movement
+		//if (MousePresent) // PORT
+		//	Mouse(MDelta);	// Clear accumulated mouse movement
 		lasttimecount = TimeCount;
 		return;
 	}
@@ -896,7 +896,7 @@ void InitActorList (void)
 // give the player the first free spots
 //
 	GetNewActor ();
-	player = new;
+	player = New;
 
 }
 
@@ -921,16 +921,16 @@ void GetNewActor (void)
 	if (!objfreelist)
 		Quit ("GetNewActor: No free spots in objlist!");
 
-	new = objfreelist;
-	objfreelist = new->prev;
-	memset (new,0,sizeof(*new));
+	New = objfreelist;
+	objfreelist = New->prev;
+	memset (New,0,sizeof(*New));
 
 	if (lastobj)
-		lastobj->next = new;
-	new->prev = lastobj;	// new->next is allready NULL from memset
+		lastobj->next = New;
+	New->prev = lastobj;	// new->next is allready NULL from memset
 
-	new->active = false;
-	lastobj = new;
+	New->active = ac_no;
+	lastobj = New;
 
 	objcount++;
 }
@@ -1005,7 +1005,7 @@ void StopMusic(void)
 		if (audiosegs[STARTMUSIC + i])
 		{
 			MM_SetPurge(&((memptr)audiosegs[STARTMUSIC + i]),3);
-			MM_SetLock(&((memptr)audiosegs[STARTMUSIC + i]),false);
+			MM_SetLock(&((memptr)audiosegs[STARTMUSIC + i]),False);
 		}
 }
 
@@ -1030,15 +1030,15 @@ void StartMusic(void)
 //	if ((chunk == -1) || (MusicMode != smm_AdLib))
 //DEBUG control panel		return;
 
-	MM_BombOnError (false);
+	MM_BombOnError (False);
 	CA_CacheAudioChunk(STARTMUSIC + chunk);
-	MM_BombOnError (true);
+	MM_BombOnError (True);
 	if (mmerror)
-		mmerror = false;
+		mmerror = False;
 	else
 	{
-		MM_SetLock(&((memptr)audiosegs[STARTMUSIC + chunk]),true);
-		SD_StartMusic((MusicGroup far *)audiosegs[STARTMUSIC + chunk]);
+		MM_SetLock(&((memptr)audiosegs[STARTMUSIC + chunk]),True);
+		SD_StartMusic((MusicGroup *)audiosegs[STARTMUSIC + chunk]);
 	}
 }
 
@@ -1059,13 +1059,13 @@ void StartMusic(void)
 #define WHITETICS		6
 
 
-byte	far redshifts[NUMREDSHIFTS][768];
-byte	far whiteshifts[NUMREDSHIFTS][768];
+byte	redshifts[NUMREDSHIFTS][768];
+byte	whiteshifts[NUMREDSHIFTS][768];
 
 int		damagecount,bonuscount;
 boolean	palshifted;
 
-extern 	byte	far	gamepal;
+extern 	byte	gamepal;
 
 /*
 =====================
@@ -1077,7 +1077,7 @@ extern 	byte	far	gamepal;
 
 void InitRedShifts (void)
 {
-	byte	far *workptr, far *baseptr;
+	byte	*workptr, *baseptr;
 	int		i,j,delta;
 
 
@@ -1086,7 +1086,7 @@ void InitRedShifts (void)
 //
 	for (i=1;i<=NUMREDSHIFTS;i++)
 	{
-		workptr = (byte far *)&redshifts[i-1][0];
+		workptr = (byte *)&redshifts[i-1][0];
 		baseptr = &gamepal;
 
 		for (j=0;j<=255;j++)
@@ -1102,7 +1102,7 @@ void InitRedShifts (void)
 
 	for (i=1;i<=NUMWHITESHIFTS;i++)
 	{
-		workptr = (byte far *)&whiteshifts[i-1][0];
+		workptr = (byte *)&whiteshifts[i-1][0];
 		baseptr = &gamepal;
 
 		for (j=0;j<=255;j++)
@@ -1202,19 +1202,19 @@ void UpdatePaletteShifts (void)
 	{
 		VW_WaitVBL(1);
 		VL_SetPalette (redshifts[red-1]);
-		palshifted = true;
+		palshifted = True;
 	}
 	else if (white)
 	{
 		VW_WaitVBL(1);
 		VL_SetPalette (whiteshifts[white-1]);
-		palshifted = true;
+		palshifted = True;
 	}
 	else if (palshifted)
 	{
 		VW_WaitVBL(1);
 		VL_SetPalette (&gamepal);		// back to normal
-		palshifted = false;
+		palshifted = False;
 	}
 }
 
@@ -1273,7 +1273,7 @@ void DoActor (objtype *ob)
 
 	if (!ob->ticcount)
 	{
-		think =	ob->state->think;
+		think =	(void(*)(objtype *))ob->state->think;
 		if (think)
 		{
 			think (ob);
@@ -1300,7 +1300,7 @@ void DoActor (objtype *ob)
 	ob->ticcount-=tics;
 	while ( ob->ticcount <= 0)
 	{
-		think = ob->state->action;			// end of state action
+		think = (void(*)(objtype *))ob->state->action;			// end of state action
 		if (think)
 		{
 			think (ob);
@@ -1332,7 +1332,7 @@ think:
 	//
 	// think
 	//
-	think =	ob->state->think;
+	think = (void(*)(objtype *))ob->state->think;
 	if (think)
 	{
 		think (ob);
@@ -1370,17 +1370,18 @@ void PlayLoop (void)
 	int		give;
 	int	helmetangle;
 
-	playstate = TimeCount = lasttimecount = 0;
+	playstate = ex_stillplaying;
+	TimeCount = lasttimecount = 0;
 	frameon = 0;
-	running = false;
+	running = False;
 	anglefrac = 0;
 	facecount = 0;
 	funnyticount = 0;
 	memset (buttonstate,0,sizeof(buttonstate));
 	ClearPaletteShifts ();
 
-	if (MousePresent)
-		Mouse(MDelta);	// Clear accumulated mouse movement
+	//if (MousePresent) // PORT
+		//Mouse(MDelta);	// Clear accumulated mouse movement
 
 	if (demoplayback)
 		IN_StartAck ();
@@ -1389,7 +1390,7 @@ void PlayLoop (void)
 	{
 		if (virtualreality)
 		{
-			helmetangle = peek (0x40,0xf0);
+			//helmetangle = peek (0x40,0xf0); // PORT
 			player->angle += helmetangle;
 			if (player->angle >= ANGLES)
 				player->angle -= ANGLES;
@@ -1401,7 +1402,7 @@ void PlayLoop (void)
 //
 // actor thinking
 //
-		madenoise = false;
+		madenoise = False;
 
 		MoveDoors ();
 		MovePWalls ();

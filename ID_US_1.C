@@ -30,7 +30,7 @@
 
 #pragma	hdrstop
 
-#pragma	warn	-pia
+//#pragma	warn	-pia
 
 
 //	Global variables
@@ -50,8 +50,8 @@ static	boolean		US_Started;
 					CursorBad;
 		int			CursorX,CursorY;
 
-		void		(*USL_MeasureString)(char far *,word *,word *) = VW_MeasurePropString,
-					(*USL_DrawString)(char far *) = VWB_DrawPropString;
+		void		(*USL_MeasureString)(char *,word *,word *) = VW_MeasurePropString,
+					(*USL_DrawString)(char *) = VWB_DrawPropString;
 
 		SaveGame	Games[MaxSaveGames];
 		HighScore	Scores[MaxScores] =
@@ -75,8 +75,8 @@ static	boolean		US_Started;
 //			from DOS.
 //
 ///////////////////////////////////////////////////////////////////////////
-#pragma	warn	-par
-#pragma	warn	-rch
+//#pragma	warn	-par
+//#pragma	warn	-rch
 int
 USL_HardError(word errval,int ax,int bp,int si)
 {
@@ -91,7 +91,7 @@ static	WindowRec	wr;
 		char		c,*s,*t;
 
 
-	di = _DI;
+	//di = _DI; // PORT
 
 	if (ax < 0)
 		s = "Device Error";
@@ -108,7 +108,7 @@ static	WindowRec	wr;
 		s = buf;
 	}
 
-	c = peekb(0x40,0x49);	// Get the current screen mode
+	//c = peekb(0x40,0x49);	// Get the current screen mode // PORT
 	if ((c < 4) || (c == 7))
 		goto oh_kill_me;
 
@@ -123,7 +123,7 @@ static	WindowRec	wr;
 
 asm	sti	// Let the keyboard interrupts come through
 
-	while (true)
+	while (True)
 	{
 		switch (IN_WaitForASCII())
 		{
@@ -156,8 +156,8 @@ oh_kill_me:
 #undef	RETRY
 #undef	ABORT
 }
-#pragma	warn	+par
-#pragma	warn	+rch
+//#pragma	warn	+par
+//#pragma	warn	+rch
 
 
 ///////////////////////////////////////////////////////////////////////////
@@ -172,43 +172,43 @@ US_Startup(void)
 
 	if (US_Started)
 		return;
+	// PORT
+	//harderr(USL_HardError);	// Install the fatal error handler
 
-	harderr(USL_HardError);	// Install the fatal error handler
+	//US_InitRndT(True);		// Initialize the random number generator
 
-	US_InitRndT(true);		// Initialize the random number generator
+	//for (i = 1;i < _argc;i++)
+	//{
+	//	switch (US_CheckParm(_argv[i],ParmStrings2))
+	//	{
+	//	case 0:
+	//		compatability = True;
+	//		break;
+	//	case 1:
+	//		compatability = False;
+	//		break;
+	//	}
+	//}
 
-	for (i = 1;i < _argc;i++)
-	{
-		switch (US_CheckParm(_argv[i],ParmStrings2))
-		{
-		case 0:
-			compatability = true;
-			break;
-		case 1:
-			compatability = false;
-			break;
-		}
-	}
+	//// Check for TED launching here
+	//for (i = 1;i < _argc;i++)
+	//{
+	//	n = US_CheckParm(_argv[i],ParmStrings);
+	//	switch(n)
+	//	{
+	//	 case 0:
+	//	   tedlevelnum = atoi(_argv[i + 1]);
+	//	   if (tedlevelnum >= 0)
+	//	     tedlevel = True;
+	//	   break;
 
-	// Check for TED launching here
-	for (i = 1;i < _argc;i++)
-	{
-		n = US_CheckParm(_argv[i],ParmStrings);
-		switch(n)
-		{
-		 case 0:
-		   tedlevelnum = atoi(_argv[i + 1]);
-		   if (tedlevelnum >= 0)
-		     tedlevel = true;
-		   break;
+	//	 case 1:
+	//	   NoWait = True;
+	//	   break;
+	//	}
+	//}
 
-		 case 1:
-		   NoWait = true;
-		   break;
-		}
-	}
-
-	US_Started = true;
+	US_Started = True;
 }
 
 
@@ -223,7 +223,7 @@ US_Shutdown(void)
 	if (!US_Started)
 		return;
 
-	US_Started = false;
+	US_Started = False;
 }
 
 ///////////////////////////////////////////////////////////////////////////
@@ -272,7 +272,7 @@ US_CheckParm(char *parm,char **strings)
 //
 ///////////////////////////////////////////////////////////////////////////
 void
-US_SetPrintRoutines(void (*measure)(char far *,word *,word *),void (*print)(char far *))
+US_SetPrintRoutines(void (*measure)(char *,word *,word *),void (*print)(char *))
 {
 	USL_MeasureString = measure;
 	USL_DrawString = print;
@@ -285,9 +285,9 @@ US_SetPrintRoutines(void (*measure)(char far *,word *,word *),void (*print)(char
 //
 ///////////////////////////////////////////////////////////////////////////
 void
-US_Print(char far *s)
+US_Print(char *s)
 {
-	char	c,far *se;
+	char	c,*se;
 	word	w,h;
 
 	while (*s)
@@ -326,7 +326,7 @@ US_PrintUnsigned(longword n)
 {
 	char	buffer[32];
 
-	US_Print(ultoa(n,buffer,10));
+	US_Print(_ultoa(n,buffer,10));
 }
 
 ///////////////////////////////////////////////////////////////////////////
@@ -339,7 +339,7 @@ US_PrintSigned(long n)
 {
 	char	buffer[32];
 
-	US_Print(ltoa(n,buffer,10));
+	US_Print(_ltoa(n,buffer,10));
 }
 
 ///////////////////////////////////////////////////////////////////////////
@@ -348,7 +348,7 @@ US_PrintSigned(long n)
 //
 ///////////////////////////////////////////////////////////////////////////
 void
-USL_PrintInCenter(char far *s,Rect r)
+USL_PrintInCenter(char *s,Rect r)
 {
 	word	w,h,
 			rw,rh;
@@ -368,7 +368,7 @@ USL_PrintInCenter(char far *s,Rect r)
 //
 ///////////////////////////////////////////////////////////////////////////
 void
-US_PrintCentered(char far *s)
+US_PrintCentered(char *s)
 {
 	Rect	r;
 
@@ -387,7 +387,7 @@ US_PrintCentered(char far *s)
 //
 ///////////////////////////////////////////////////////////////////////////
 void
-US_CPrintLine(char far *s)
+US_CPrintLine(char *s)
 {
 	word	w,h;
 
@@ -408,9 +408,9 @@ US_CPrintLine(char far *s)
 //
 ///////////////////////////////////////////////////////////////////////////
 void
-US_CPrint(char far *s)
+US_CPrint(char *s)
 {
-	char	c,far *se;
+	char	c,*se;
 
 	while (*s)
 	{
@@ -565,8 +565,8 @@ USL_XORICursor(int x,int y,char *s,word cursor)
 //	US_LineInput() - Gets a line of user input at (x,y), the string defaults
 //		to whatever is pointed at by def. Input is restricted to maxchars
 //		chars or maxwidth pixels wide. If the user hits escape (and escok is
-//		true), nothing is copied into buf, and false is returned. If the
-//		user hits return, the current string is copied into buf, and true is
+//		True), nothing is copied into buf, and False is returned. If the
+//		user hits return, the current string is copied into buf, and True is
 //		returned
 //
 ///////////////////////////////////////////////////////////////////////////
@@ -592,9 +592,9 @@ US_LineInput(int x,int y,char *buf,char *def,boolean escok,
 		*s = '\0';
 	*olds = '\0';
 	cursor = strlen(s);
-	cursormoved = redraw = true;
+	cursormoved = redraw = True;
 
-	cursorvis = done = false;
+	cursorvis = done = False;
 	lasttime = TimeCount;
 	LastASCII = key_None;
 	LastScan = sc_None;
@@ -620,36 +620,36 @@ US_LineInput(int x,int y,char *buf,char *def,boolean escok,
 			if (cursor)
 				cursor--;
 			c = key_None;
-			cursormoved = true;
+			cursormoved = True;
 			break;
 		case sc_RightArrow:
 			if (s[cursor])
 				cursor++;
 			c = key_None;
-			cursormoved = true;
+			cursormoved = True;
 			break;
 		case sc_Home:
 			cursor = 0;
 			c = key_None;
-			cursormoved = true;
+			cursormoved = True;
 			break;
 		case sc_End:
 			cursor = strlen(s);
 			c = key_None;
-			cursormoved = true;
+			cursormoved = True;
 			break;
 
 		case sc_Return:
 			strcpy(buf,s);
-			done = true;
-			result = true;
+			done = True;
+			result = True;
 			c = key_None;
 			break;
 		case sc_Escape:
 			if (escok)
 			{
-				done = true;
-				result = false;
+				done = True;
+				result = False;
 			}
 			c = key_None;
 			break;
@@ -659,19 +659,19 @@ US_LineInput(int x,int y,char *buf,char *def,boolean escok,
 			{
 				strcpy(s + cursor - 1,s + cursor);
 				cursor--;
-				redraw = true;
+				redraw = True;
 			}
 			c = key_None;
-			cursormoved = true;
+			cursormoved = True;
 			break;
 		case sc_Delete:
 			if (s[cursor])
 			{
 				strcpy(s + cursor,s + cursor + 1);
-				redraw = true;
+				redraw = True;
 			}
 			c = key_None;
-			cursormoved = true;
+			cursormoved = True;
 			break;
 
 		case 0x4c:	// Keypad 5
@@ -700,7 +700,7 @@ US_LineInput(int x,int y,char *buf,char *def,boolean escok,
 				for (i = len + 1;i > cursor;i--)
 					s[i] = s[i - 1];
 				s[cursor++] = c;
-				redraw = true;
+				redraw = True;
 			}
 		}
 
@@ -718,21 +718,21 @@ US_LineInput(int x,int y,char *buf,char *def,boolean escok,
 			py = y;
 			USL_DrawString(s);
 
-			redraw = false;
+			redraw = False;
 		}
 
 		if (cursormoved)
 		{
-			cursorvis = false;
+			cursorvis = False;
 			lasttime = TimeCount - TickBase;
 
-			cursormoved = false;
+			cursormoved = False;
 		}
 		if (TimeCount - lasttime > TickBase / 2)
 		{
 			lasttime = TimeCount;
 
-			cursorvis ^= true;
+			cursorvis ^= True;
 		}
 		if (cursorvis)
 			USL_XORICursor(x,y,s,cursor);

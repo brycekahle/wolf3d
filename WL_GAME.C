@@ -222,7 +222,7 @@ void ScanInfoPlane (void)
 {
 	unsigned	x,y,i,j;
 	int			tile;
-	unsigned	far	*start;
+	unsigned	*start;
 
 	start = mapsegs[1];
 	for (y=0;y<mapheight;y++)
@@ -625,7 +625,7 @@ void ScanInfoPlane (void)
 void SetupGameLevel (void)
 {
 	int	x,y,i;
-	unsigned	far *map,tile,spot;
+	unsigned	*map,tile,spot;
 
 
 	if (!loadedgame)
@@ -640,9 +640,9 @@ void SetupGameLevel (void)
 	}
 
 	if (demoplayback || demorecord)
-		US_InitRndT (false);
+		US_InitRndT (False);
 	else
-		US_InitRndT (true);
+		US_InitRndT (True);
 
 //
 // load the level
@@ -914,13 +914,13 @@ void DrawPlayScreen (void)
 void StartDemoRecord (int levelnumber)
 {
 	MM_GetPtr (&demobuffer,MAXDEMOSIZE);
-	MM_SetLock (&demobuffer,true);
-	demoptr = (char far *)demobuffer;
+	MM_SetLock (&demobuffer,True);
+	demoptr = (char *)demobuffer;
 	lastdemoptr = demoptr+MAXDEMOSIZE;
 
 	*demoptr = levelnumber;
 	demoptr += 4;				// leave space for length
-	demorecord = true;
+	demorecord = True;
 }
 
 
@@ -938,25 +938,25 @@ void FinishDemoRecord (void)
 {
 	long	length,level;
 
-	demorecord = false;
+	demorecord = False;
 
-	length = demoptr - (char far *)demobuffer;
+	length = demoptr - (char *)demobuffer;
 
-	demoptr = ((char far *)demobuffer)+1;
-	*(unsigned far *)demoptr = length;
+	demoptr = ((char *)demobuffer)+1;
+	*(unsigned *)demoptr = length;
 
 	CenterWindow(24,3);
 	PrintY+=6;
 	US_Print(" Demo number (0-9):");
 	VW_UpdateScreen();
 
-	if (US_LineInput (px,py,str,NULL,true,2,0))
+	if (US_LineInput (px,py,str,NULL,True,2,0))
 	{
 		level = atoi (str);
 		if (level>=0 && level<=9)
 		{
 			demoname[4] = '0'+level;
-			CA_WriteFile (demoname,(void far *)demobuffer,length);
+			CA_WriteFile (demoname,(void *)demobuffer,length);
 		}
 	}
 
@@ -987,7 +987,7 @@ void RecordDemo (void)
 	US_Print("  Demo which level(1-10):");
 	VW_UpdateScreen();
 	VW_FadeIn ();
-	esc = !US_LineInput (px,py,str,NULL,true,2,0);
+	esc = !US_LineInput (px,py,str,NULL,True,2,0);
 	if (esc)
 		return;
 
@@ -1010,17 +1010,17 @@ void RecordDemo (void)
 	DrawPlayScreen ();
 	VW_FadeIn ();
 
-	startgame = false;
-	demorecord = true;
+	startgame = False;
+	demorecord = True;
 
 	SetupGameLevel ();
 	StartMusic ();
 	PM_CheckMainMem ();
-	fizzlein = true;
+	fizzlein = True;
 
 	PlayLoop ();
 
-	demoplayback = false;
+	demoplayback = False;
 
 	StopMusic ();
 	VW_FadeOut ();
@@ -1055,18 +1055,18 @@ void PlayDemo (int demonumber)
 
 	CA_CacheGrChunk(dems[demonumber]);
 	demoptr = grsegs[dems[demonumber]];
-	MM_SetLock (&grsegs[dems[demonumber]],true);
+	MM_SetLock (&grsegs[dems[demonumber]],True);
 #else
 	demoname[4] = '0'+demonumber;
 	CA_LoadFile (demoname,&demobuffer);
-	MM_SetLock (&demobuffer,true);
-	demoptr = (char far *)demobuffer;
+	MM_SetLock (&demobuffer,True);
+	demoptr = (char *)demobuffer;
 #endif
 
 	NewGame (1,0);
 	gamestate.mapon = *demoptr++;
 	gamestate.difficulty = gd_hard;
-	length = *((unsigned far *)demoptr)++;
+	length = *((unsigned *)demoptr)++;
 	demoptr++;
 	lastdemoptr = demoptr-4+length;
 
@@ -1076,13 +1076,13 @@ void PlayDemo (int demonumber)
 	DrawPlayScreen ();
 	VW_FadeIn ();
 
-	startgame = false;
-	demoplayback = true;
+	startgame = False;
+	demoplayback = True;
 
 	SetupGameLevel ();
 	StartMusic ();
 	PM_CheckMainMem ();
-	fizzlein = true;
+	fizzlein = True;
 
 	PlayLoop ();
 
@@ -1092,7 +1092,7 @@ void PlayDemo (int demonumber)
 	MM_FreePtr (&demobuffer);
 #endif
 
-	demoplayback = false;
+	demoplayback = False;
 
 	StopMusic ();
 	VW_FadeOut ();
@@ -1117,7 +1117,7 @@ void Died (void)
 	long	dx,dy;
 	int		iangle,curangle,clockwise,counter,change;
 
-	gamestate.weapon = -1;			// take away weapon
+	gamestate.weapon = (weapontype)-1;			// take away weapon
 	SD_PlaySound (PLAYERDEATHSND);
 //
 // swing around to face attacker
@@ -1125,7 +1125,7 @@ void Died (void)
 	dx = killerobj->x - player->x;
 	dy = player->y - killerobj->y;
 
-	fangle = atan2(dy,dx);			// returns -pi to pi
+	fangle = atan2((float)dy,(float)dx);			// returns -pi to pi // PORT add float cast
 	if (fangle<0)
 		fangle = M_PI*2+fangle;
 
@@ -1197,12 +1197,12 @@ void Died (void)
 	bufferofs += screenofs;
 	VW_Bar (0,0,viewwidth,viewheight,4);
 	IN_ClearKeysDown ();
-	FizzleFade(bufferofs,displayofs+screenofs,viewwidth,viewheight,70,false);
+	FizzleFade(bufferofs,displayofs+screenofs,viewwidth,viewheight,70,False);
 	bufferofs -= screenofs;
 	IN_UserInput(100);
 	SD_WaitSoundDone ();
 
-	if (tedlevel == false)	// SO'S YA DON'T GET KILLED WHILE LAUNCHING!
+	if (tedlevel == False)	// SO'S YA DON'T GET KILLED WHILE LAUNCHING!
 	  gamestate.lives--;
 
 	if (gamestate.lives > -1)
@@ -1248,7 +1248,7 @@ restartgame:
 	ClearMemory ();
 	SETFONTCOLOR(0,15);
 	DrawPlayScreen ();
-	died = false;
+	died = False;
 restart:
 	do
 	{
@@ -1256,9 +1256,9 @@ restart:
 		  gamestate.score = gamestate.oldscore;
 		DrawScore();
 
-		startgame = false;
+		startgame = False;
 		if (loadedgame)
-			loadedgame = false;
+			loadedgame = False;
 		else
 			SetupGameLevel ();
 
@@ -1270,15 +1270,15 @@ restart:
 		}
 #endif
 
-		ingame = true;
+		ingame = True;
 		StartMusic ();
 		PM_CheckMainMem ();
 		if (!died)
 			PreloadGraphics ();
 		else
-			died = false;
+			died = False;
 
-		fizzlein = true;
+		fizzlein = True;
 		DrawLevel ();
 
 startplayloop:
@@ -1294,7 +1294,7 @@ startplayloop:
 				long lasttimecount = TimeCount;
 
 				while(TimeCount < lasttimecount+150)
-				//while(DigiPlaying!=false)
+				//while(DigiPlaying!=False)
 					SD_Poll();
 			}
 			else
@@ -1309,14 +1309,14 @@ startplayloop:
 			player->x = spearx;
 			player->y = speary;
 			player->angle = spearangle;
-			spearflag = false;
+			spearflag = False;
 			Thrust (0,0);
 			goto startplayloop;
 		}
 #endif
 
 		StopMusic ();
-		ingame = false;
+		ingame = False;
 
 		if (demorecord && playstate != ex_warped)
 			FinishDemoRecord ();
@@ -1338,7 +1338,7 @@ startplayloop:
 #ifdef SPEARDEMO
 			if (gamestate.mapon == 1)
 			{
-				died = true;			// don't "get psyched!"
+				died = True;			// don't "get psyched!"
 
 				VW_FadeOut ();
 
@@ -1348,7 +1348,7 @@ startplayloop:
 
 				#pragma warn -sus
 				#ifndef JAPAN
-				_fstrcpy(MainMenu[viewscores].string,STR_VS);
+				strcpy(MainMenu[viewscores].string,STR_VS);
 				#endif
 				MainMenu[viewscores].routine = CP_ViewScores;
 				#pragma warn +sus
@@ -1360,7 +1360,7 @@ startplayloop:
 #ifdef JAPDEMO
 			if (gamestate.mapon == 3)
 			{
-				died = true;			// don't "get psyched!"
+				died = True;			// don't "get psyched!"
 
 				VW_FadeOut ();
 
@@ -1370,7 +1370,7 @@ startplayloop:
 
 				#pragma warn -sus
 				#ifndef JAPAN
-				_fstrcpy(MainMenu[viewscores].string,STR_VS);
+				strcpy(MainMenu[viewscores].string,STR_VS);
 				#endif
 				MainMenu[viewscores].routine = CP_ViewScores;
 				#pragma warn +sus
@@ -1429,7 +1429,7 @@ startplayloop:
 
 		case ex_died:
 			Died ();
-			died = true;			// don't "get psyched!"
+			died = True;			// don't "get psyched!"
 
 			if (gamestate.lives > -1)
 				break;				// more lives left
@@ -1442,9 +1442,9 @@ startplayloop:
 
 			#pragma warn -sus
 			#ifndef JAPAN
-			_fstrcpy(MainMenu[viewscores].string,STR_VS);
+			strcpy(MainMenu[viewscores].string,STR_VS);
 			#endif
-			MainMenu[viewscores].routine = CP_ViewScores;
+			MainMenu[viewscores].routine = (void (*)(int w))CP_ViewScores; // PORT add cast
 			#pragma warn +sus
 
 			return;
@@ -1466,9 +1466,9 @@ startplayloop:
 
 			#pragma warn -sus
 			#ifndef JAPAN
-			_fstrcpy(MainMenu[viewscores].string,STR_VS);
+			strcpy(MainMenu[viewscores].string,STR_VS);
 			#endif
-			MainMenu[viewscores].routine = CP_ViewScores;
+			MainMenu[viewscores].routine = (void (*)(int w))CP_ViewScores; // PORT add cast
 			#pragma warn +sus
 
 			return;

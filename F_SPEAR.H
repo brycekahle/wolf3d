@@ -17,7 +17,7 @@
 #define STR_COPY2		"you into the game."
 
 #define STR_COPY3		"Wow, you must have the early version of the"
-#define STR_COPY4		"manual with the totally false information in it."
+#define STR_COPY4		"manual with the totally False information in it."
 
 #define STR_COPY5		"I would let you into the game, but seeing"
 #define STR_COPY6		"as that was not at all the right answer..."

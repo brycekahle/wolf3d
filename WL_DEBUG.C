@@ -2,7 +2,7 @@
 
 #include "WL_DEF.H"
 #pragma hdrstop
-#include <BIOS.H>
+//#include <BIOS.H>
 
 /*
 =============================================================================
@@ -56,7 +56,7 @@ void DebugMemory (void)
 	int	i;
 	char    scratch[80],str[10];
 	long	mem;
-	spritetype _seg	*block;
+	spritetype *block;
 
 	CenterWindow (16,7);
 
@@ -136,69 +136,70 @@ void CountObjects (void)
 
 void PicturePause (void)
 {
-	int			i;
-	byte		p;
-	unsigned	x;
-	byte		far	*dest,far *src;
-	memptr		buffer;
-
-	VW_ColorBorder (15);
-	FinishPaletteShifts ();
-
-	LastScan = 0;
-	while (!LastScan)
-	;
-	if (LastScan != sc_Enter)
-	{
-		VW_ColorBorder (0);
-		return;
-	}
-
-	VW_ColorBorder (1);
-	VW_SetScreen (0,0);
+	// PORT something in this method causes errors below
+//	int			i;
+//	byte		p;
+//	unsigned	x;
+//	byte		*dest,*src;
+//	memptr		buffer;
 //
-// vga stuff...
+//	VW_ColorBorder (15);
+//	FinishPaletteShifts ();
 //
-
-	ClearMemory ();
-	CA_SetAllPurge();
-	MM_GetPtr (&buffer,64000);
-	for (p=0;p<4;p++)
-	{
-	   src = MK_FP(0xa000,displayofs);
-	   dest = (byte far *)buffer+p;
-	   VGAREADMAP(p);
-	   for (x=0;x<16000;x++,dest+=4)
-		   *dest = *src++;
-	}
-
-
-#if 0
-	for (p=0;p<4;p++)
-	{
-		src = MK_FP(0xa000,0);
-		dest = (byte far *)buffer+51200+p;
-		VGAREADMAP(p);
-		for (x=0;x<3200;x++,dest+=4)
-			*dest = *src++;
-	}
-#endif
-
-	asm	mov	ax,0x13
-	asm	int	0x10
-
-	dest = MK_FP(0xa000,0);
-	_fmemcpy (dest,buffer,64000);
-
-	VL_SetPalette (&gamepal);
-
-
-	IN_Shutdown ();
-
-	VW_WaitVBL(70);
-	bioskey(0);
-	VW_WaitVBL(70);
-	Quit (NULL);
+//	LastScan = 0;
+//	while (!LastScan)
+//	;
+//	if (LastScan != sc_Enter)
+//	{
+//		VW_ColorBorder (0);
+//		return;
+//	}
+//
+//	VW_ColorBorder (1);
+//	VW_SetScreen (0,0);
+////
+//// vga stuff...
+////
+//
+//	ClearMemory ();
+//	CA_SetAllPurge();
+//	MM_GetPtr (&buffer,64000);
+//	for (p=0;p<4;p++)
+//	{
+//	   //src = MK_FP(0xa000,displayofs); // PORT
+//	   dest = (byte *)buffer+p;
+//	   VGAREADMAP(p);
+//	   for (x=0;x<16000;x++,dest+=4)
+//		   *dest = *src++;
+//	}
+//
+//
+//#if 0
+//	for (p=0;p<4;p++)
+//	{
+//		src = MK_FP(0xa000,0);
+//		dest = (byte *)buffer+51200+p;
+//		VGAREADMAP(p);
+//		for (x=0;x<3200;x++,dest+=4)
+//			*dest = *src++;
+//	}
+//#endif
+//
+//	asm	mov	ax,0x13
+//	asm	int	0x10
+//
+//	//dest = MK_FP(0xa000,0); // PORT
+//	memcpy (dest,buffer,64000);
+//
+//	VL_SetPalette (&gamepal);
+//
+//
+//	IN_Shutdown ();
+//
+//	VW_WaitVBL(70);
+//	//bioskey(0); // PORT
+//	VW_WaitVBL(70);
+//	Quit (NULL);
 }
 
 
@@ -217,7 +218,7 @@ void PicturePause (void)
 void ShapeTest (void)
 {
 extern	word	NumDigi;
-extern	word	_seg *DigiList;
+extern	word	*DigiList;
 static	char	buf[10];
 
 	boolean			done;
@@ -225,11 +226,11 @@ static	char	buf[10];
 	int				i,j,k,x;
 	longword		l;
 	memptr			addr;
-	PageListStruct	far *page;
+	PageListStruct	*page;
 
 	CenterWindow(20,16);
 	VW_UpdateScreen();
-	for (i = 0,done = false;!done;)
+	for (i = 0,done = False;!done;)
 	{
 		US_ClearWindow();
 //		sound = -1;
@@ -314,7 +315,7 @@ static	char	buf[10];
 			}
 			else
 			{
-				byte far *dp = (byte far *)MK_FP(addr,0);
+				//byte *dp = (byte *)MK_FP(addr,0); // PORT
 				for (j = 0;j < NumDigi;j++)
 				{
 					k = (DigiList[(j * 2) + 1] + (PMPageSize - 1)) / PMPageSize;
@@ -335,8 +336,9 @@ static	char	buf[10];
 				}
 				for (j = 0;j < page->length;j += 32)
 				{
-					byte v = dp[j];
-					int v2 = (unsigned)v;
+					// PORT
+					//byte v = dp[j]; 
+					/*int v2 = (unsigned)v;
 					v2 -= 128;
 					v2 /= 4;
 					if (v2 < 0)
@@ -346,7 +348,7 @@ static	char	buf[10];
 					else
 						VWB_Vlin(WindowY + WindowH - 32,
 								WindowY + WindowH - 32 + v2,
-								WindowX + 8 + (j / 32),BLACK);
+								WindowX + 8 + (j / 32),BLACK);*/
 				}
 			}
 		}
@@ -388,7 +390,7 @@ static	char	buf[10];
 //				SD_PlayDigitized(sound);
 			break;
 		case sc_Escape:
-			done = true;
+			done = True;
 			break;
 		case sc_Enter:
 			PM_GetPage(i);
@@ -423,7 +425,7 @@ int DebugKeys (void)
 		PrintY+=6;
 		US_Print(" Border color (0-15):");
 		VW_UpdateScreen();
-		esc = !US_LineInput (px,py,str,NULL,true,2,0);
+		esc = !US_LineInput (px,py,str,NULL,True,2,0);
 		if (!esc)
 		{
 			level = atoi (str);
@@ -550,7 +552,7 @@ int DebugKeys (void)
 		PrintY+=6;
 		US_Print("  Add how many extra VBLs(0-8):");
 		VW_UpdateScreen();
-		esc = !US_LineInput (px,py,str,NULL,true,2,0);
+		esc = !US_LineInput (px,py,str,NULL,True,2,0);
 		if (!esc)
 		{
 			level = atoi (str);
@@ -569,7 +571,7 @@ int DebugKeys (void)
 		US_Print("  Warp to which level(1-21):");
 #endif
 		VW_UpdateScreen();
-		esc = !US_LineInput (px,py,str,NULL,true,2,0);
+		esc = !US_LineInput (px,py,str,NULL,True,2,0);
 		if (!esc)
 		{
 			level = atoi (str);
@@ -671,7 +673,7 @@ void ViewMap (void)
 	boolean		button0held;
 
 	viewtype = actoratview;
-//	button0held = false;
+//	button0held = False;
 
 
 	maporgx = player->tilex - VIEWTILEX/2;
@@ -703,13 +705,13 @@ void ViewMap (void)
 #if 0
 		if (c.button0 && !button0held)
 		{
-			button0held = true;
+			button0held = True;
 			viewtype++;
 			if (viewtype>visview)
 				viewtype = mapview;
 		}
 		if (!c.button0)
-			button0held = false;
+			button0held = False;
 #endif
 
 		OverheadRefresh ();

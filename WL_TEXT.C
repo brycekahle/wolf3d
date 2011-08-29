@@ -51,7 +51,7 @@ TEXT FORMATTING COMMANDS
 int			pagenum,numpages;
 
 unsigned	leftmargin[TEXTROWS],rightmargin[TEXTROWS];
-char		far *text;
+char		*text;
 unsigned	rowon;
 
 int			picx,picy,picnum,picdelay;
@@ -203,7 +203,7 @@ void HandleCommand (void)
 		break;
 	case 'P':		// ^P is start of next page, ^E is end of file
 	case 'E':
-		layoutdone = true;
+		layoutdone = True;
 		text--;    	// back up to the '^'
 		break;
 
@@ -295,7 +295,7 @@ void NewLine (void)
 	//
 	// overflowed the page, so skip until next page break
 	//
-		layoutdone = true;
+		layoutdone = True;
 		do
 		{
 			if (*text == '^')
@@ -303,7 +303,7 @@ void NewLine (void)
 				ch = toupper(*(text+1));
 				if (ch == 'E' || ch == 'P')
 				{
-					layoutdone = true;
+					layoutdone = True;
 					return;
 				}
 			}
@@ -437,7 +437,7 @@ void PageLayout (boolean shownumber)
 	px = LEFTMARGIN;
 	py = TOPMARGIN;
 	rowon = 0;
-	layoutdone = false;
+	layoutdone = False;
 
 //
 // make sure we are starting layout text (^P first command)
@@ -487,13 +487,13 @@ void PageLayout (boolean shownumber)
 		px = 208;
 		#else
 		strcpy (str,"pg ");
-		itoa (pagenum,str2,10);
+		_itoa (pagenum,str2,10);
 		strcat (str,str2);
 		strcat (str," of ");
 		py = 183;
 		px = 213;
 		#endif
-		itoa (numpages,str2,10);
+		_itoa (numpages,str2,10);
 		strcat (str,str2);
 		fontcolor = 0x4f; 			   //12^BACKCOLOR;
 
@@ -542,7 +542,7 @@ void BackPage (void)
 */
 void CacheLayoutGraphics (void)
 {
-	char	far *bombpoint, far *textstart;
+	char	*bombpoint, *textstart;
 	char	ch;
 
 	textstart = text;
@@ -598,7 +598,7 @@ void CacheLayoutGraphics (void)
 #ifdef JAPAN
 void ShowArticle (int which)
 #else
-void ShowArticle (char far *article)
+void ShowArticle (char *article)
 #endif
 {
 	#ifdef JAPAN
@@ -651,28 +651,28 @@ void ShowArticle (char far *article)
 	CacheLayoutGraphics ();
 	#endif
 
-	newpage = true;
-	firstpage = true;
+	newpage = True;
+	firstpage = True;
 
 	do
 	{
 		if (newpage)
 		{
-			newpage = false;
+			newpage = False;
 			#ifdef JAPAN
 			if (!which)
 				CA_CacheScreen(snames[pagenum - 1]);
 			else
 				CA_CacheScreen(enames[which*2 + pagenum - 1]);
 			#else
-			PageLayout (true);
+			PageLayout (True);
 			#endif
 			VW_UpdateScreen ();
 			if (firstpage)
 			{
 				VL_FadeIn(0,255,&gamepal,10);
 				// VW_FadeIn ()
-				firstpage = false;
+				firstpage = False;
 			}
 		}
 
@@ -693,7 +693,7 @@ void ShowArticle (char far *article)
 				#else
 				pagenum--;
 				#endif
-				newpage = true;
+				newpage = True;
 			}
 			break;
 
@@ -703,7 +703,7 @@ void ShowArticle (char far *article)
 		case sc_RightArrow:		// the text allready points at next page
 			if (pagenum<numpages)
 			{
-				newpage = true;
+				newpage = True;
 				#ifdef JAPAN
 				pagenum++;
 				#endif
@@ -747,7 +747,7 @@ char helpfilename[13] = "HELPART.",
 void HelpScreens (void)
 {
 	int			artnum;
-	char far 	*text;
+	char 	*text;
 	memptr		layout;
 
 
@@ -767,12 +767,12 @@ void HelpScreens (void)
 #ifdef ARTSEXTERN
 	artnum = helpextern;
 	CA_CacheGrChunk (artnum);
-	text = (char _seg *)grsegs[artnum];
-	MM_SetLock (&grsegs[artnum], true);
+	text = (char *)grsegs[artnum];
+	MM_SetLock (&grsegs[artnum], True);
 #else
 	CA_LoadFile (helpfilename,&layout);
-	text = (char _seg *)layout;
-	MM_SetLock (&layout, true);
+	text = (char *)layout;
+	MM_SetLock (&layout, True);
 #endif
 
 	ShowArticle (text);
@@ -787,7 +787,7 @@ void HelpScreens (void)
 
 	VW_FadeOut();
 
-	FreeMusic ();
+	//FreeMusic (); // PORT
 	CA_DownLevel ();
 	MM_SortMem ();
 #endif
@@ -800,7 +800,7 @@ void HelpScreens (void)
 void EndText (void)
 {
 	int			artnum;
-	char far 	*text;
+	char 	*text;
 	memptr		layout;
 
 
@@ -828,13 +828,13 @@ void EndText (void)
 #ifdef ARTSEXTERN
 	artnum = endextern+gamestate.episode;
 	CA_CacheGrChunk (artnum);
-	text = (char _seg *)grsegs[artnum];
-	MM_SetLock (&grsegs[artnum], true);
+	text = (char *)grsegs[artnum];
+	MM_SetLock (&grsegs[artnum], True);
 #else
 	endfilename[6] = '1'+gamestate.episode;
 	CA_LoadFile (endfilename,&layout);
-	text = (char _seg *)layout;
-	MM_SetLock (&layout, true);
+	text = (char *)layout;
+	MM_SetLock (&layout, True);
 #endif
 
 	ShowArticle (text);
@@ -849,10 +849,10 @@ void EndText (void)
 	VW_FadeOut();
 	SETFONTCOLOR(0,15);
 	IN_ClearKeysDown();
-	if (MousePresent)
-		Mouse(MDelta);	// Clear accumulated mouse movement
+	//if (MousePresent) // PORT
+	//	Mouse(MDelta);	// Clear accumulated mouse movement
 
-	FreeMusic ();
+	//FreeMusic (); 
 	CA_DownLevel ();
 	MM_SortMem ();
 #endif

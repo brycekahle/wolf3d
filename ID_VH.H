@@ -48,9 +48,9 @@ typedef struct
 //===========================================================================
 
 
-extern	pictabletype	_seg *pictable;
-extern	pictabletype	_seg *picmtable;
-extern	spritetabletype _seg *spritetable;
+extern	pictabletype	*pictable;
+extern	pictabletype	*picmtable;
+extern	spritetabletype *spritetable;
 
 extern	byte	fontcolor;
 extern	int	fontnumber;
@@ -78,8 +78,8 @@ void VWB_DrawPic (int x, int y, int chunknum);
 void VWB_DrawMPic(int x, int y, int chunknum);
 void VWB_Bar (int x, int y, int width, int height, int color);
 
-void VWB_DrawPropString	 (char far *string);
-void VWB_DrawMPropString (char far *string);
+void VWB_DrawPropString	 (char *string);
+void VWB_DrawMPropString (char *string);
 void VWB_DrawSprite (int x, int y, int chunknum);
 void VWB_Plot (int x, int y, int color);
 void VWB_Hlin (int x1, int x2, int y, int color);
@@ -89,7 +89,7 @@ void VWB_Vlin (int y1, int y2, int x, int color);
 //
 // wolfenstein EGA compatability stuff
 //
-extern byte far gamepal;
+extern byte gamepal;
 
 void VH_SetDefaultColors (void);
 
@@ -110,7 +110,7 @@ void VH_SetDefaultColors (void);
 #define VW_FadeOut()	VL_FadeOut(0,255,0,0,0,30);
 #define VW_ScreenToScreen	VL_ScreenToScreen
 #define VW_SetDefaultColors	VH_SetDefaultColors
-void	VW_MeasurePropString (char far *string, word *width, word *height);
+void	VW_MeasurePropString (char *string, word *width, word *height);
 #define EGAMAPMASK(x)	VGAMAPMASK(x)
 #define EGAWRITEMODE(x)	VGAWRITEMODE(x)
 
