@@ -936,14 +936,14 @@ char	demoname[13] = "DEMO?.";
 
 void FinishDemoRecord (void)
 {
-	long	length,level;
+	int	length,level;
 
 	demorecord = False;
 
 	length = demoptr - (char *)demobuffer;
 
 	demoptr = ((char *)demobuffer)+1;
-	*(unsigned *)demoptr = length;
+	*(unsigned int *)demoptr = length;
 
 	CenterWindow(24,3);
 	PrintY+=6;

@@ -40,7 +40,7 @@ void	VWL_UpdateScreenBlocks (void);
 void VW_DrawPropString (char *string)
 {
 	fontstruct	*font;
-	int		width,step,height,i;
+	short		width,step,height,i;
 	byte	*source, *dest, *origdest;
 	byte	ch,mask;
 
@@ -66,10 +66,10 @@ asm	lds	si,[source]
 asm	les	di,[dest]
 
 vertloop:
-asm	mov	al,[si]
+asm	mov	al,[esi]
 asm	or	al,al
 asm	je	next
-asm	mov	[es:di],ah			// draw color
+asm	mov	[es:edi],ah			// draw color
 
 next:
 asm	add	si,bx
@@ -96,7 +96,7 @@ bufferwidth = ((dest+1)-origdest)*4;
 void VW_DrawColorPropString (char *string)
 {
 	fontstruct	*font;
-	int		width,step,height,i;
+	short		width,step,height,i;
 	byte	*source, *dest, *origdest;
 	byte	ch,mask;
 
@@ -122,10 +122,10 @@ asm	lds	si,[source]
 asm	les	di,[dest]
 
 vertloop:
-asm	mov	al,[si]
+asm	mov	al,[esi]
 asm	or	al,al
 asm	je	next
-asm	mov	[es:di],ah			// draw color
+asm	mov	[es:edi],ah			// draw color
 
 next:
 asm	add	si,bx
@@ -472,7 +472,7 @@ boolean FizzleFade (unsigned source, unsigned dest,
 	unsigned width,unsigned height, unsigned frames, boolean abortable)
 {
 	int			pixperframe;
-	unsigned	drawofs,pagedelta;
+	unsigned short	drawofs,pagedelta;
 	byte 		mask,maskb[8] = {1,2,4,8};
 	unsigned	x,y,p,frame;
 	long		rndval;
@@ -531,9 +531,9 @@ noxor:
 			//VGAMAPMASK(mask);
 
 			asm	mov	di,[drawofs]
-			asm	mov	al,[es:di]
+			asm	mov	al,[es:edi]
 			asm add	di,[pagedelta]
-			asm	mov	[es:di],al
+			asm	mov	[es:edi],al
 
 			if (rndval == 1)		// entire sequence has been completed
 				return False;

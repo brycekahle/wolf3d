@@ -8,7 +8,7 @@ void Quit (char *error);
 
 //===========================================================================
 
-
+// VGA Sequence Controller (no longer available)
 #define SC_INDEX			0x3C4
 #define SC_RESET			0
 #define SC_CLOCK			1
@@ -81,12 +81,12 @@ void Quit (char *error);
 
 //===========================================================================
 
-extern	unsigned	bufferofs;			// all drawing is reletive to this
-extern	unsigned	displayofs,pelpan;	// last setscreen coordinates
+extern	unsigned	short bufferofs;			// all drawing is reletive to this
+extern	unsigned	short displayofs,pelpan;	// last setscreen coordinates
 
-extern	unsigned	screenseg;			// set to 0xa000 for asm convenience
+extern	unsigned	short screenseg;			// set to 0xa000 for asm convenience
 
-extern	unsigned	linewidth;
+extern	unsigned	short linewidth;
 extern	unsigned	ylookup[MAXSCANLINES];
 
 extern	boolean		screenfaded;

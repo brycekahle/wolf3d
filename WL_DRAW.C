@@ -149,7 +149,7 @@ asm	mov	ax,[WORD PTR a]
 asm	mov	cx,[WORD PTR a+2]
 
 asm	or	cx,cx
-asm	jns	aok:				// negative?
+asm	jns	aok				// negative?
 asm	neg	cx
 asm	neg	ax
 asm	sbb	cx,0
@@ -171,7 +171,7 @@ asm	adc	dx,0
 // put result dx:ax in 2's complement
 //
 asm	test	si,0x8000		// is the result negative?
-asm	jz	ansok:
+asm	jz	ansok
 asm	neg	dx
 asm	neg	ax
 asm	sbb	dx,0
@@ -394,8 +394,8 @@ int	CalcHeight (void)
 */
 
 long		postsource;
-unsigned	postx;
-unsigned	postwidth;
+unsigned	short postx;
+unsigned	short postwidth;
 
 void	ScalePost (void)		// VGA version
 {
@@ -404,7 +404,7 @@ void	ScalePost (void)		// VGA version
 
 	asm	mov	bx,[postx]
 	asm	shl	bx,1
-	asm	mov	bp,WORD PTR [wallheight+bx]		// fractional height (low 3 bits frac)
+	asm	mov	bp,WORD PTR [wallheight+ebx]		// fractional height (low 3 bits frac)
 	asm	and	bp,0xfff8				// bp = heightscaler*4
 	asm	shr	bp,1
 	asm	cmp	bp,[maxscaleshl2]
@@ -424,13 +424,13 @@ heightok:
 	asm	shl	bx,3						// bx = pixel*8+pixwidth
 	asm	add	bx,[postwidth]
 
-	asm	mov	al,BYTE PTR [mapmasks1-1+bx]	// -1 because no widths of 0
+	asm	mov	al,BYTE PTR [mapmasks1-1+ebx]	// -1 because no widths of 0
 	asm	mov	dx,SC_INDEX+1
 	asm	out	dx,al						// set bit mask register
 	asm	lds	si,DWORD PTR [postsource]
-	asm	call DWORD PTR [bp]				// scale the line of pixels
+	asm	call DWORD PTR [ebp]				// scale the line of pixels
 
-	asm	mov	al,BYTE PTR [ss:mapmasks2-1+bx]   // -1 because no widths of 0
+	asm	mov	al,BYTE PTR [ss:mapmasks2-1+ebx]   // -1 because no widths of 0
 	asm	or	al,al
 	asm	jz	nomore
 
@@ -439,9 +439,9 @@ heightok:
 	//
 	asm	inc	di
 	asm	out	dx,al						// set bit mask register
-	asm	call DWORD PTR [bp]				// scale the line of pixels
+	asm	call DWORD PTR [ebp]				// scale the line of pixels
 
-	asm	mov	al,BYTE PTR [ss:mapmasks3-1+bx]	// -1 because no widths of 0
+	asm	mov	al,BYTE PTR [ss:mapmasks3-1+ebx]	// -1 because no widths of 0
 	asm	or	al,al
 	asm	jz	nomore
 	//
@@ -449,7 +449,7 @@ heightok:
 	//
 	asm	inc	di
 	asm	out	dx,al						// set bit mask register
-	asm	call DWORD PTR [bp]				// scale the line of pixels
+	asm	call DWORD PTR [ebp]				// scale the line of pixels
 
 
 nomore:
@@ -969,7 +969,7 @@ unsigned vgaCeiling[]=
 
 void VGAClearScreen (void)
 {
- unsigned ceiling=vgaCeiling[gamestate.episode*10+mapon];
+ unsigned short ceiling=vgaCeiling[gamestate.episode*10+mapon];
 
   //
   // clear the screen

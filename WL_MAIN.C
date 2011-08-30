@@ -53,8 +53,8 @@ int                     dirangle[9] = {0,ANGLES/8,2*ANGLES/8,3*ANGLES/8,4*ANGLES
 //
 fixed           focallength;
 unsigned        screenofs;
-int             viewwidth;
-int             viewheight;
+short             viewwidth;
+short             viewheight;
 int             centerx;
 int             shootdelta;                     // pixels away from centerx a target can be
 fixed           scale,maxslope;
@@ -365,69 +365,69 @@ boolean SaveTheGame(int file,int x,int y)
 
 
 	DiskFlopAnim(x,y);
-	CA_FarWrite (file,(byte *)&gamestate,sizeof(gamestate));
+	_write (file,(void *)&gamestate,sizeof(gamestate));
 	checksum = DoChecksum((byte *)&gamestate,sizeof(gamestate),checksum);
 
 	DiskFlopAnim(x,y);
 #ifdef SPEAR
-	CA_FarWrite (file,(byte *)&LevelRatios[0],sizeof(LRstruct)*20);
+	_write (file,(void *)&LevelRatios[0],sizeof(LRstruct)*20);
 	checksum = DoChecksum((byte *)&LevelRatios[0],sizeof(LRstruct)*20,checksum);
 #else
-	CA_FarWrite (file,(byte *)&LevelRatios[0],sizeof(LRstruct)*8);
+	_write (file,(void *)&LevelRatios[0],sizeof(LRstruct)*8);
 	checksum = DoChecksum((byte *)&LevelRatios[0],sizeof(LRstruct)*8,checksum);
 #endif
 
 	DiskFlopAnim(x,y);
-	CA_FarWrite (file,(byte *)tilemap,sizeof(tilemap));
+	_write (file,(void *)tilemap,sizeof(tilemap));
 	checksum = DoChecksum((byte *)tilemap,sizeof(tilemap),checksum);
 	DiskFlopAnim(x,y);
-	CA_FarWrite (file,(byte *)actorat,sizeof(actorat));
+	_write (file,(void *)actorat,sizeof(actorat));
 	checksum = DoChecksum((byte *)actorat,sizeof(actorat),checksum);
 
-	CA_FarWrite (file,(byte *)areaconnect,sizeof(areaconnect));
-	CA_FarWrite (file,(byte *)areabyplayer,sizeof(areabyplayer));
+	_write (file,(void *)areaconnect,sizeof(areaconnect));
+	_write (file,(void *)areabyplayer,sizeof(areabyplayer));
 
 	for (ob = player ; ob ; ob=ob->next)
 	{
 	 DiskFlopAnim(x,y);
-	 CA_FarWrite (file,(byte *)ob,sizeof(*ob));
+	 _write (file,(void *)ob,sizeof(*ob));
 	}
 	nullobj.active = ac_badobject;          // end of file marker
 	DiskFlopAnim(x,y);
-	CA_FarWrite (file,(byte *)&nullobj,sizeof(nullobj));
+	_write (file,(void *)&nullobj,sizeof(nullobj));
 
 
 
 	DiskFlopAnim(x,y);
-	CA_FarWrite (file,(byte *)&laststatobj,sizeof(laststatobj));
+	_write (file,(void *)&laststatobj,sizeof(laststatobj));
 	checksum = DoChecksum((byte *)&laststatobj,sizeof(laststatobj),checksum);
 	DiskFlopAnim(x,y);
-	CA_FarWrite (file,(byte *)statobjlist,sizeof(statobjlist));
+	_write (file,(void *)statobjlist,sizeof(statobjlist));
 	checksum = DoChecksum((byte *)statobjlist,sizeof(statobjlist),checksum);
 
 	DiskFlopAnim(x,y);
-	CA_FarWrite (file,(byte *)doorposition,sizeof(doorposition));
+	_write (file,(void *)doorposition,sizeof(doorposition));
 	checksum = DoChecksum((byte *)doorposition,sizeof(doorposition),checksum);
 	DiskFlopAnim(x,y);
-	CA_FarWrite (file,(byte *)doorobjlist,sizeof(doorobjlist));
+	_write (file,(void *)doorobjlist,sizeof(doorobjlist));
 	checksum = DoChecksum((byte *)doorobjlist,sizeof(doorobjlist),checksum);
 
 	DiskFlopAnim(x,y);
-	CA_FarWrite (file,(byte *)&pwallstate,sizeof(pwallstate));
+	_write (file,(void *)&pwallstate,sizeof(pwallstate));
 	checksum = DoChecksum((byte *)&pwallstate,sizeof(pwallstate),checksum);
-	CA_FarWrite (file,(byte *)&pwallx,sizeof(pwallx));
+	_write (file,(void *)&pwallx,sizeof(pwallx));
 	checksum = DoChecksum((byte *)&pwallx,sizeof(pwallx),checksum);
-	CA_FarWrite (file,(byte *)&pwally,sizeof(pwally));
+	_write (file,(void *)&pwally,sizeof(pwally));
 	checksum = DoChecksum((byte *)&pwally,sizeof(pwally),checksum);
-	CA_FarWrite (file,(byte *)&pwalldir,sizeof(pwalldir));
+	_write (file,(void *)&pwalldir,sizeof(pwalldir));
 	checksum = DoChecksum((byte *)&pwalldir,sizeof(pwalldir),checksum);
-	CA_FarWrite (file,(byte *)&pwallpos,sizeof(pwallpos));
+	_write (file,(void *)&pwallpos,sizeof(pwallpos));
 	checksum = DoChecksum((byte *)&pwallpos,sizeof(pwallpos),checksum);
 
 	//
 	// WRITE OUT CHECKSUM
 	//
-	CA_FarWrite (file,(byte *)&checksum,sizeof(checksum));
+	_write (file,(void *)&checksum,sizeof(checksum));
 
 	return(True);
 }
@@ -451,15 +451,15 @@ boolean LoadTheGame(int file,int x,int y)
 	checksum = 0;
 
 	DiskFlopAnim(x,y);
-	CA_FarRead (file,(byte *)&gamestate,sizeof(gamestate));
+	_read (file,(void *)&gamestate,sizeof(gamestate));
 	checksum = DoChecksum((byte *)&gamestate,sizeof(gamestate),checksum);
 
 	DiskFlopAnim(x,y);
 #ifdef SPEAR
-	CA_FarRead (file,(void *)&LevelRatios[0],sizeof(LRstruct)*20);
+	_read (file,(void *)&LevelRatios[0],sizeof(LRstruct)*20);
 	checksum = DoChecksum((byte *)&LevelRatios[0],sizeof(LRstruct)*20,checksum);
 #else
-	CA_FarRead (file,(byte *)&LevelRatios[0],sizeof(LRstruct)*8);
+	_read (file,(void *)&LevelRatios[0],sizeof(LRstruct)*8);
 	checksum = DoChecksum((byte *)&LevelRatios[0],sizeof(LRstruct)*8,checksum);
 #endif
 
@@ -467,25 +467,25 @@ boolean LoadTheGame(int file,int x,int y)
 	SetupGameLevel ();
 
 	DiskFlopAnim(x,y);
-	CA_FarRead (file,(byte *)tilemap,sizeof(tilemap));
+	_read (file,(void *)tilemap,sizeof(tilemap));
 	checksum = DoChecksum((byte *)tilemap,sizeof(tilemap),checksum);
 	DiskFlopAnim(x,y);
-	CA_FarRead (file,(byte *)actorat,sizeof(actorat));
+	_read (file,(void *)actorat,sizeof(actorat));
 	checksum = DoChecksum((byte *)actorat,sizeof(actorat),checksum);
 
-	CA_FarRead (file,(byte *)areaconnect,sizeof(areaconnect));
-	CA_FarRead (file,(byte *)areabyplayer,sizeof(areabyplayer));
+	_read (file,(void *)areaconnect,sizeof(areaconnect));
+	_read (file,(void *)areabyplayer,sizeof(areabyplayer));
 
 
 
 	InitActorList ();
 	DiskFlopAnim(x,y);
-	CA_FarRead (file,(byte *)player,sizeof(*player));
+	_read (file,(void *)player,sizeof(*player));
 
 	while (1)
 	{
 	 DiskFlopAnim(x,y);
-		CA_FarRead (file,(byte *)&nullobj,sizeof(nullobj));
+		_read (file,(void *)&nullobj,sizeof(nullobj));
 		if (nullobj.active == ac_badobject)
 			break;
 		GetNewActor ();
@@ -496,32 +496,32 @@ boolean LoadTheGame(int file,int x,int y)
 
 
 	DiskFlopAnim(x,y);
-	CA_FarRead (file,(byte *)&laststatobj,sizeof(laststatobj));
+	_read (file,(void *)&laststatobj,sizeof(laststatobj));
 	checksum = DoChecksum((byte *)&laststatobj,sizeof(laststatobj),checksum);
 	DiskFlopAnim(x,y);
-	CA_FarRead (file,(byte *)statobjlist,sizeof(statobjlist));
+	_read (file,(void *)statobjlist,sizeof(statobjlist));
 	checksum = DoChecksum((byte *)statobjlist,sizeof(statobjlist),checksum);
 
 	DiskFlopAnim(x,y);
-	CA_FarRead (file,(byte *)doorposition,sizeof(doorposition));
+	_read (file,(void *)doorposition,sizeof(doorposition));
 	checksum = DoChecksum((byte *)doorposition,sizeof(doorposition),checksum);
 	DiskFlopAnim(x,y);
-	CA_FarRead (file,(byte *)doorobjlist,sizeof(doorobjlist));
+	_read (file,(void *)doorobjlist,sizeof(doorobjlist));
 	checksum = DoChecksum((byte *)doorobjlist,sizeof(doorobjlist),checksum);
 
 	DiskFlopAnim(x,y);
-	CA_FarRead (file,(byte *)&pwallstate,sizeof(pwallstate));
+	_read (file,(void *)&pwallstate,sizeof(pwallstate));
 	checksum = DoChecksum((byte *)&pwallstate,sizeof(pwallstate),checksum);
-	CA_FarRead (file,(byte *)&pwallx,sizeof(pwallx));
+	_read (file,(void *)&pwallx,sizeof(pwallx));
 	checksum = DoChecksum((byte *)&pwallx,sizeof(pwallx),checksum);
-	CA_FarRead (file,(byte *)&pwally,sizeof(pwally));
+	_read (file,(void *)&pwally,sizeof(pwally));
 	checksum = DoChecksum((byte *)&pwally,sizeof(pwally),checksum);
-	CA_FarRead (file,(byte *)&pwalldir,sizeof(pwalldir));
+	_read (file,(void *)&pwalldir,sizeof(pwalldir));
 	checksum = DoChecksum((byte *)&pwalldir,sizeof(pwalldir),checksum);
-	CA_FarRead (file,(byte *)&pwallpos,sizeof(pwallpos));
+	_read (file,(void *)&pwallpos,sizeof(pwallpos));
 	checksum = DoChecksum((byte *)&pwallpos,sizeof(pwallpos),checksum);
 
-	CA_FarRead (file,(byte *)&oldchecksum,sizeof(oldchecksum));
+	_read (file,(void *)&oldchecksum,sizeof(oldchecksum));
 
 	if (oldchecksum != checksum)
 	{

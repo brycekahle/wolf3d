@@ -13,11 +13,16 @@
 
 #include "VERSION.H"
 
+#ifdef _MSC_VER
+
 #define asm __asm
+#define _CRT_SECURE_NO_WARNINGS 1
+
+#endif
 
 typedef	enum	{False,True}	boolean;
 typedef	unsigned	char		byte;
-typedef	unsigned	int			word;
+typedef	unsigned	short		word;
 typedef	unsigned	long		longword;
 typedef	byte *					Ptr;
 

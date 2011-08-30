@@ -773,8 +773,8 @@ extern	byte		*scalermemory;
 extern	fixed		focallength;
 extern	unsigned	viewangles;
 extern	unsigned	screenofs;
-extern	int		    viewwidth;
-extern	int			viewheight;
+extern	short		    viewwidth;
+extern	short			viewheight;
 extern	int			centerx;
 extern	int			shootdelta;
 
@@ -1001,8 +1001,8 @@ extern	int		viewangle;
 extern	fixed	viewsin,viewcos;
 
 extern	long		postsource;
-extern	unsigned	postx;
-extern	unsigned	postwidth;
+extern	unsigned	short postx;
+extern	unsigned	short postwidth;
 
 
 extern	int		horizwall[],vertwall[];
@@ -1092,7 +1092,7 @@ extern	byte		mapmasks1[4][8];
 extern	byte		mapmasks2[4][8];
 extern	byte		mapmasks3[4][8];
 
-extern	int			maxscale,maxscaleshl2;
+extern	short			maxscale,maxscaleshl2;
 
 extern	boolean	insetupscaling;
 

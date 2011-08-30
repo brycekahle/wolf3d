@@ -64,17 +64,17 @@ void CAL_ShiftSprite (unsigned segment,unsigned source,unsigned dest,
 
 void CA_OpenDebug (void);
 void CA_CloseDebug (void);
-boolean CA_FarRead (int handle, byte *dest, long length);
-boolean CA_FarWrite (int handle, byte *source, long length);
+//boolean CA_FarRead (int handle, byte *dest, long length);
+//boolean CA_FarWrite (int handle, byte *source, long length);
 boolean CA_ReadFile (char *filename, memptr *ptr);
 boolean CA_LoadFile (char *filename, memptr *ptr);
-boolean CA_WriteFile (char *filename, void *ptr, long length);
+boolean CA_WriteFile (char *filename, void *ptr, int length);
 
-long CA_RLEWCompress (unsigned *source, long length, unsigned *dest,
-  unsigned rlewtag);
+long CA_RLEWCompress (unsigned short *source, int length, unsigned short *dest,
+  unsigned short rlewtag);
 
-void CA_RLEWexpand (unsigned *source, unsigned *dest,long length,
-  unsigned rlewtag);
+void CA_RLEWexpand (unsigned short *source, unsigned short *dest, int length,
+  unsigned short rlewtag);
 
 void CA_Startup (void);
 void CA_Shutdown (void);

@@ -155,7 +155,7 @@ good:
 
 void MML_SetupXMS (void)
 {
-	unsigned	base,size;
+	unsigned short	base,thesize;
 
 asm	{
 	mov	ax,0x4310
@@ -184,10 +184,10 @@ asm	{
 gotone:
 asm	{
 	mov	[base],bx
-	mov	[size],dx
+	mov	[thesize],dx
 	}
-	MML_UseSpace (base,size);
-	mminfo.XMSmem += size*16;
+	MML_UseSpace (base,thesize);
+	mminfo.XMSmem += thesize*16;
 	UMBbase[numUMBs] = base;
 	numUMBs++;
 	if (numUMBs < MAXUMBS)
@@ -208,7 +208,7 @@ done:;
 void MML_ShutdownXMS (void)
 {
 	int	i;
-	unsigned	base;
+	unsigned short	base;
 
 	for (i=0;i<numUMBs;i++)
 	{

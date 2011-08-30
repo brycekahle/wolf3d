@@ -56,7 +56,13 @@ extern	unsigned char		signon;
 #endif
 //-----------------
 
+#ifdef _MSC_VER
+
 #define asm __asm
+#define _CRT_SECURE_NO_WARNINGS 1
+
+#endif
+
 #define GREXT	"VGA"
 
 //
@@ -67,7 +73,7 @@ extern	unsigned char		signon;
 
 typedef enum {False, True}		boolean;
 typedef	unsigned	char		byte;
-typedef	unsigned	int			word;
+typedef	unsigned	short		word;
 typedef	unsigned	long		longword;
 typedef	byte *					Ptr;
 

@@ -146,7 +146,7 @@ INL_KeyService(void)
 static	boolean	special;
 		byte	k,c,
 				temp;
-		int		i;
+		//int		i;
 
 	// PORT
 	//k = inportb(0x60);	// Get the scan code
@@ -308,8 +308,9 @@ asm		shr		si,cl		//  and shift the count that many times
 asm		mov		cl,[ys]
 asm		shr		di,cl
 
-asm		mov		[x],si		// Store the values into the variables
-asm		mov		[y],di
+// PORT add word ptr
+asm		mov		word ptr [x],si		// Store the values into the variables
+asm		mov		word ptr [y],di
 
 asm		pop		di
 asm		pop		si

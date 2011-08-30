@@ -175,7 +175,7 @@ PML_ShutdownEMS(void)
 	if (EMSPresent)
 	{
 	asm	mov	ah,EMS_FREEPAGES
-	asm	mov	dx,[EMSHandle]
+	asm	mov	dx,word ptr [EMSHandle]
 	asm	int	EMS_INT
 		/*if (_AH)
 			Quit ("PML_ShutdownEMS: Error freeing EMS");*/
@@ -473,9 +473,9 @@ PML_ReadFromFile(byte *buf,long offset,word length)
 		Quit("PML_ReadFromFile: Null pointer");
 	if (!offset)
 		Quit("PML_ReadFromFile: Zero offset");
-	if (lseek(PageFile,offset,SEEK_SET) != offset)
+	if (_lseek(PageFile,offset,SEEK_SET) != offset)
 		Quit("PML_ReadFromFile: Seek failed");
-	if (!CA_FarRead(PageFile,buf,length))
+	if (!_read(PageFile,buf,length))
 		Quit("PML_ReadFromFile: Read failed");
 }
 
@@ -492,14 +492,14 @@ PML_OpenPageFile(void)
 	word			*lengthptr;
 	PageListStruct	*page;
 
-	PageFile = open(PageFileName,O_RDONLY + O_BINARY);
+	PageFile = _open(PageFileName,O_RDONLY + O_BINARY);
 	if (PageFile == -1)
 		Quit("PML_OpenPageFile: Unable to open page file");
 
 	// Read in header variables
-	read(PageFile,&ChunksInFile,sizeof(ChunksInFile));
-	read(PageFile,&PMSpriteStart,sizeof(PMSpriteStart));
-	read(PageFile,&PMSoundStart,sizeof(PMSoundStart));
+	_read(PageFile,&ChunksInFile,sizeof(ChunksInFile));
+	_read(PageFile,&PMSpriteStart,sizeof(PMSpriteStart));
+	_read(PageFile,&PMSoundStart,sizeof(PMSoundStart));
 
 	// Allocate and clear the page list
 	PMNumBlocks = ChunksInFile;
@@ -511,7 +511,7 @@ PML_OpenPageFile(void)
 	// Read in the chunk offsets
 	size = sizeof(longword) * ChunksInFile;
 	MM_GetPtr(&buf,size);
-	if (!CA_FarRead(PageFile,(byte *)buf,size))
+	if (!_read(PageFile,(byte *)buf,size))
 		Quit("PML_OpenPageFile: Offset read failed");
 	offsetptr = (longword *)buf;
 	for (i = 0,page = PMPages;i < ChunksInFile;i++,page++)
@@ -521,7 +521,7 @@ PML_OpenPageFile(void)
 	// Read in the chunk lengths
 	size = sizeof(word) * ChunksInFile;
 	MM_GetPtr(&buf,size);
-	if (!CA_FarRead(PageFile,(byte *)buf,size))
+	if (!_read(PageFile,(byte *)buf,size))
 		Quit("PML_OpenPageFile: Length read failed");
 	lengthptr = (word *)buf;
 	for (i = 0,page = PMPages;i < ChunksInFile;i++,page++)

@@ -12,12 +12,12 @@
 // SC_INDEX is expected to stay at SC_MAPMASK for proper operation
 //
 
-unsigned	bufferofs;
-unsigned	displayofs,pelpan;
+unsigned	short bufferofs;
+unsigned	short displayofs,pelpan;
 
-unsigned	screenseg=SCREENSEG;		// set to 0xa000 for asm convenience
+unsigned	short screenseg=SCREENSEG;		// set to 0xa000 for asm convenience
 
-unsigned	linewidth;
+unsigned	short linewidth;
 unsigned	ylookup[MAXSCANLINES];
 
 boolean		screenfaded;
@@ -756,9 +756,9 @@ void VL_Bar (int x, int y, int width, int height, int color)
 =================
 */
 
-void VL_MemToLatch (byte *source, int width, int height, unsigned dest)
+void VL_MemToLatch (byte *source, int width, int height, unsigned short dest)
 {
-	unsigned	count;
+	unsigned short	count;
 	byte	plane,mask;
 
 	count = ((width+3)/4)*height;
@@ -865,7 +865,7 @@ void VL_MaskedToScreen (byte *source, int width, int height, int x, int y)
 =================
 */
 
-void VL_LatchToScreen (unsigned source, int width, int height, int x, int y)
+void VL_LatchToScreen (unsigned short source, short width, short height, short x, short y)
 {
 	// PORT macro errors
 	//VGAWRITEMODE(1);
@@ -873,7 +873,7 @@ void VL_LatchToScreen (unsigned source, int width, int height, int x, int y)
 
 asm	mov	di,[y]				// dest = bufferofs+ylookup[y]+(x>>2)
 asm	shl	di,1
-asm	mov	di,[WORD PTR ylookup+di]
+asm	mov	di,[WORD PTR ylookup+edi]
 asm	add	di,[bufferofs]
 asm	mov	ax,[x]
 asm	shr	ax,2
@@ -1013,7 +1013,7 @@ void VL_DrawTile8String (char *str, char *tile8ptr, int printx, int printy)
 void VL_DrawLatch8String (char *str, unsigned tile8ptr, int printx, int printy)
 {
 	int		i;
-	unsigned	src,dest;
+	unsigned short	src,dest;
 
 	dest = bufferofs+ylookup[printy]+(printx>>2);
 
@@ -1032,28 +1032,28 @@ asm	mov	ax,SCREENSEG
 asm	mov	ds,ax
 
 asm	lodsw
-asm	mov	[di],ax
+asm	mov	[edi],ax
 asm	add	di,dx
 asm	lodsw
-asm	mov	[di],ax
+asm	mov	[edi],ax
 asm	add	di,dx
 asm	lodsw
-asm	mov	[di],ax
+asm	mov	[edi],ax
 asm	add	di,dx
 asm	lodsw
-asm	mov	[di],ax
+asm	mov	[edi],ax
 asm	add	di,dx
 asm	lodsw
-asm	mov	[di],ax
+asm	mov	[edi],ax
 asm	add	di,dx
 asm	lodsw
-asm	mov	[di],ax
+asm	mov	[edi],ax
 asm	add	di,dx
 asm	lodsw
-asm	mov	[di],ax
+asm	mov	[edi],ax
 asm	add	di,dx
 asm	lodsw
-asm	mov	[di],ax
+asm	mov	[edi],ax
 asm	add	di,dx
 
 asm	mov	ax,ss
