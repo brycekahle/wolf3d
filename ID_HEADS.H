@@ -7,6 +7,7 @@
 #include <ERRNO.H>
 #include <FCNTL.H>
 #include <IO.H>
+#include <share.h>
 //#include <MEM.H>
 #include <PROCESS.H>
 #include <STDIO.H>

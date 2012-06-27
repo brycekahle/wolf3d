@@ -169,7 +169,7 @@ long GRFILEPOS(int c)
 void CA_OpenDebug (void)
 {
 	_unlink ("DEBUG.TXT");
-	debughandle = _open("DEBUG.TXT", O_CREAT | O_WRONLY | O_TEXT);
+	_sopen_s(&debughandle, "DEBUG.TXT", _O_CREAT | _O_WRONLY | _O_TEXT, _SH_DENYNO, _S_IREAD | _S_IWRITE);
 }
 
 void CA_CloseDebug (void)
@@ -288,7 +288,7 @@ boolean CA_ReadFile (char *filename, memptr *ptr)
 	int handle;
 	long size;
 
-	if ((handle = _open(filename,O_RDONLY | O_BINARY, S_IREAD)) == -1)
+	if (_sopen_s(&handle, filename, _O_RDONLY | _O_BINARY, _SH_DENYWR, _S_IREAD) != 0)
 		return False;
 
 	size = _filelength (handle);
@@ -317,10 +317,10 @@ boolean CA_WriteFile (char *filename, void *ptr, int length)
 	int handle;
 	//long size;
 
-	handle = _open(filename,O_CREAT | O_BINARY | O_WRONLY,
-				S_IREAD | S_IWRITE | S_IFREG);
+	errno_t err = _sopen_s(&handle, filename, _O_CREAT | _O_BINARY | _O_WRONLY, _SH_DENYNO,
+				_S_IREAD | _S_IWRITE);
 
-	if (handle == -1)
+	if (err != 0)
 		return False;
 
 	if (!_write (handle,ptr,length))
@@ -349,7 +349,7 @@ boolean CA_LoadFile (char *filename, memptr *ptr)
 	int handle;
 	long size;
 
-	if ((handle = _open(filename,O_RDONLY | O_BINARY, S_IREAD)) == -1)
+	if (_sopen_s(&handle, filename, _O_RDONLY | _O_BINARY, _SH_DENYNO, _S_IREAD) != 0)
 		return False;
 
 	size = _filelength (handle);
@@ -910,11 +910,10 @@ void CAL_SetupGrFile (void)
 // load ???dict.ext (huffman dictionary for graphics files)
 //
 
-	strcpy(fname,gdictname);
-	strcat(fname,extension);
+	strcpy_s(fname,_countof(fname), gdictname);
+	strcat_s(fname,_countof(fname), extension);
 
-	if ((handle = _open(fname,
-		 O_RDONLY | O_BINARY, S_IREAD)) == -1)
+	if (_sopen_s(&handle, fname, _O_RDONLY | _O_BINARY, _SH_DENYWR, _S_IREAD) != 0)
 		CA_CannotOpen(fname);
 
 	_read(handle, &grhuffman, sizeof(grhuffman));
@@ -925,11 +924,10 @@ void CAL_SetupGrFile (void)
 //
 	MM_GetPtr ((memptr *)&grstarts,(NUMCHUNKS+1)*FILEPOSSIZE);
 
-	strcpy(fname,gheadname);
-	strcat(fname,extension);
+	strcpy_s(fname,_countof(fname), gheadname);
+	strcat_s(fname,_countof(fname), extension);
 
-	if ((handle = _open(fname,
-		 O_RDONLY | O_BINARY, S_IREAD)) == -1)
+	if (_sopen_s(&handle, fname,_O_RDONLY | _O_BINARY, _SH_DENYWR, _S_IREAD) != 0)
 		CA_CannotOpen(fname);
 
 	_read(handle, grstarts, (NUMCHUNKS+1)*FILEPOSSIZE);
@@ -941,11 +939,10 @@ void CAL_SetupGrFile (void)
 //
 // Open the graphics file, leaving it open until the game is finished
 //
-	strcpy(fname,gfilename);
-	strcat(fname,extension);
+	strcpy_s(fname, _countof(fname), gfilename);
+	strcat_s(fname, _countof(fname), extension);
 
-	grhandle = _open(fname, O_RDONLY | O_BINARY);
-	if (grhandle == -1)
+	if (_sopen_s(&grhandle, fname, _O_RDONLY | _O_BINARY, _SH_DENYWR, _S_IREAD) != 0)
 		CA_CannotOpen(fname);
 
 
@@ -982,11 +979,10 @@ void CAL_SetupMapFile (void)
 // load maphead.ext (offsets and tileinfo for map file)
 //
 #ifndef MAPHEADERLINKED
-	strcpy(fname,mheadname);
-	strcat(fname,extension);
+	strcpy_s(fname, _countof(fname), mheadname);
+	strcat_s(fname, _countof(fname), extension);
 
-	if ((handle = _open(fname,
-		 O_RDONLY | O_BINARY, S_IREAD)) == -1)
+	if (_sopen_s(&handle, fname,_O_RDONLY | _O_BINARY, _SH_DENYWR,_S_IREAD) != 0)
 		CA_CannotOpen(fname);
 
 	length = _filelength(handle);
@@ -1003,18 +999,16 @@ void CAL_SetupMapFile (void)
 // open the data file
 //
 #ifdef CARMACIZED
-	strcpy(fname,"GAMEMAPS.");
-	strcat(fname,extension);
+	strcpy_s(fname, _countof(fname), "GAMEMAPS.");
+	strcat_s(fname, _countof(fname), extension);
 
-	if ((maphandle = _open(fname,
-		 O_RDONLY | O_BINARY, S_IREAD)) == -1)
+	if (_sopen_s(&maphandle, fname,_O_RDONLY | _O_BINARY, _SH_DENYWR,_S_IREAD) != 0)
 		CA_CannotOpen(fname);
 #else
-	strcpy(fname,mfilename);
-	strcat(fname,extension);
+	strcpy_s(fname, _countof(fname), mfilename);
+	strcat_s(fname, _countof(fname), extension);
 
-	if ((maphandle = _open(fname,
-		 O_RDONLY | O_BINARY, S_IREAD)) == -1)
+	if (_sopen_s(&maphandle, fname, _O_RDONLY | _O_BINARY, _SH_DENYWR, _S_IREAD)) != 0)
 		CA_CannotOpen(fname);
 #endif
 
@@ -1065,11 +1059,11 @@ void CAL_SetupAudioFile (void)
 // load maphead.ext (offsets and tileinfo for map file)
 //
 #ifndef AUDIOHEADERLINKED
-	strcpy(fname,aheadname);
-	strcat(fname,extension);
+	strcpy_s(fname, _countof(fname), aheadname);
+	strcat_s(fname, _countof(fname), extension);
 
-	if ((handle = _open(fname,
-		 O_RDONLY | O_BINARY, S_IREAD)) == -1)
+	if (_sopen_s(&handle, fname,
+		 _O_RDONLY | _O_BINARY, _SH_DENYWR, _S_IREAD) != 0)
 		CA_CannotOpen(fname);
 
 	length = _filelength(handle);
@@ -1086,15 +1080,15 @@ void CAL_SetupAudioFile (void)
 // open the data file
 //
 #ifndef AUDIOHEADERLINKED
-	strcpy(fname,afilename);
-	strcat(fname,extension);
+	strcpy_s(fname, _countof(fname), afilename);
+	strcat_s(fname, _countof(fname), extension);
 
-	if ((audiohandle = _open(fname,
-		 O_RDONLY | O_BINARY, S_IREAD)) == -1)
+	if (_sopen_s(&audiohandle, fname,
+		 _O_RDONLY | _O_BINARY, _SH_DENYWR, _S_IREAD) != 0)
 		CA_CannotOpen(fname);
 #else
-	if ((audiohandle = open("AUDIO."EXTENSION,
-		 O_RDONLY | O_BINARY, S_IREAD)) == -1)
+	if (_sopen_s(&audiohandle, "AUDIO."EXTENSION,
+		 _O_RDONLY | _O_BINARY, _SH_DENYWR, _S_IREAD) != 0)
 		Quit ("Can't open AUDIO."EXTENSION"!");
 #endif
 }
@@ -1255,7 +1249,7 @@ void CA_LoadAllSounds (void)
 
 	for (i=0;i<NUMSOUNDS;i++,start++)
 		if (audiosegs[start])
-			MM_SetPurge (&(memptr)audiosegs[start],3);		// make purgable
+			MM_SetPurge ((memptr*)&audiosegs[start],3);		// make purgable
 
 cachein:
 
@@ -1333,7 +1327,7 @@ void CAL_ExpandGrChunk (int chunk, byte *source)
 	MM_GetPtr (&grsegs[chunk],expanded);
 	if (mmerror)
 		return;
-	CAL_HuffExpand (source,grsegs[chunk],expanded,grhuffman,False);
+	CAL_HuffExpand (source,(byte*)grsegs[chunk],expanded,grhuffman,False);
 }
 
 
@@ -1505,7 +1499,7 @@ void CA_CacheMap (int mapnum)
 		expanded = *source;
 		source++;
 		MM_GetPtr (&buffer2seg,expanded);
-		CAL_CarmackExpand (source, (unsigned short *)buffer2seg,expanded);
+		CAL_CarmackExpand (source, (unsigned short *)buffer2seg,(unsigned short)expanded);
 		CA_RLEWexpand (((unsigned short *)buffer2seg)+1,(unsigned short *)*dest,size, // PORT cast
 		((mapfiletype *)tinf)->RLEWtag);
 		MM_FreePtr (&buffer2seg);
@@ -1661,7 +1655,7 @@ void CA_SetAllPurge (void)
 //
 	for (i=0;i<NUMSNDCHUNKS;i++)
 		if (audiosegs[i])
-			MM_SetPurge (&(memptr)audiosegs[i],3);
+			MM_SetPurge ((memptr*)&audiosegs[i],3);
 
 //
 // free graphics
@@ -1775,7 +1769,7 @@ void CA_CacheMarks (void)
 				if (mmerror)
 					return;
 				MM_SetLock (&bigbufferseg,True);
-				lseek(grhandle,pos,SEEK_SET);
+				_lseek(grhandle,pos,SEEK_SET);
 				_read(grhandle,bigbufferseg,compressed);
 				source = (byte *)bigbufferseg;
 			}
@@ -1794,8 +1788,8 @@ void CA_CannotOpen(char *string)
 {
  char str[30];
 
- strcpy(str,"Can't open ");
- strcat(str,string);
- strcat(str,"!\n");
+ strcpy_s(str, _countof(str),"Can't open ");
+ strcat_s(str, _countof(str),string);
+ strcat_s(str, _countof(str), "!\n");
  Quit (str);
 }

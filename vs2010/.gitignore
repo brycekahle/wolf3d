@@ -4,3 +4,4 @@ Debug/
 *.suo
 *.vcxproj.filters
 *.vcxproj.user
+_Resharper*
